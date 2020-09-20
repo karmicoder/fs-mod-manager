@@ -4,7 +4,7 @@ import { app, protocol, BrowserWindow, Menu, ipcMain } from 'electron';
 import * as fs from 'fs';
 import path from 'path';
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
-import ipcServer from './background/ipcServer';
+import './background/ipcServer';
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -12,9 +12,9 @@ const isDevelopment = process.env.NODE_ENV !== 'production';
 let win: BrowserWindow | null;
 
 // Scheme must be registered before the app is ready
-// protocol.registerSchemesAsPrivileged([
-//   { scheme: 'app', privileges: { standard: true } }
-// ]);
+protocol.registerSchemesAsPrivileged([
+  { scheme: 'app', privileges: { standard: true, secure: true } }
+]);
 
 function createWindow() {
   // Create the browser window.
@@ -84,5 +84,3 @@ if (isDevelopment) {
     });
   }
 }
-
-ipcServer.start();

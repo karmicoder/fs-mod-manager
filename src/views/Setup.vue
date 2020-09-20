@@ -1,7 +1,14 @@
 <template>
-  <div class="about">
-    <h1>This is an about page</h1>
+  <div class="setup">
+    <h1>Setup</h1>
     <p>MSFS install path: {{ msfsInstallPath }}</p>
+    <button
+      class="btn btn-primary"
+      :disabled="msfsInstallPath === ''"
+      @click="goToPackages"
+    >
+      Confirm
+    </button>
   </div>
 </template>
 <script lang="ts">
@@ -12,8 +19,13 @@ import { findMsfsInstallPath } from '@/ipc';
 export default defineComponent({
   data() {
     return {
-      msfsInstallPath: 'checking...'
+      msfsInstallPath: ''
     };
+  },
+  methods: {
+    goToPackages() {
+      this.$router.push('/packages');
+    }
   },
   created() {
     findMsfsInstallPath().then((path) => (this.msfsInstallPath = path));
