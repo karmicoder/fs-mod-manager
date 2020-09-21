@@ -3,13 +3,17 @@
     {{ packages.length }} installed packages
   </p>
   <ul v-else class="packages">
-    <PackageListItem v-for="pkg in packages" :key="pkg.title" :pkg="pkg" />
+    <PackageListItem
+      v-for="pkg in packages"
+      :key="pkg.directoryName"
+      :pkg="pkg"
+    />
   </ul>
 </template>
 <script lang="ts">
-import { defineComponent } from 'vue';
+import Vue from 'vue';
 import PackageListItem from './packageListItem.vue';
-export default defineComponent({
+export default Vue.extend({
   components: { PackageListItem },
   name: 'PackageList',
   props: {

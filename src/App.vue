@@ -1,15 +1,25 @@
 <template>
-  <div id="app" class="md-app md-app-side-drawer md-theme-default">
-    <div class="md-content">
-      <router-view />
-    </div>
-  </div>
+  <div class="app"><router-view /></div>
 </template>
-<script lang="ts">
-import { defineComponent } from 'vue';
+<style lang="scss">
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+}
 
-export default defineComponent({
-  name: 'App'
-});
-</script>
-<style lang="scss"></style>
+#nav {
+  padding: 30px;
+
+  a {
+    font-weight: bold;
+    color: #2c3e50;
+
+    &.router-link-exact-active {
+      color: #42b983;
+    }
+  }
+}
+</style>

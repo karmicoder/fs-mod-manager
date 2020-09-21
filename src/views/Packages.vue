@@ -8,7 +8,7 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent } from 'vue';
+import Vue from 'vue';
 import {
   getCommunityPackages,
   getOfficialPackages,
@@ -17,7 +17,7 @@ import {
 import PackageList from '@/components/packageList.vue';
 
 // ipcRenderer.
-export default defineComponent({
+export default Vue.extend({
   components: {
     PackageList
   },

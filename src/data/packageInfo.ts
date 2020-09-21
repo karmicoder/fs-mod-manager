@@ -63,7 +63,6 @@ export async function getCommunityPackages(
   if (communityPackages && !refresh) {
     return Promise.resolve(communityPackages);
   }
-  await findMsfsInstallPath();
   const rawPackages = await findPackages('community');
   communityPackages = parsePackageInfo(rawPackages, 'community');
   console.log('parsePackageInfo complete', packageVersions);
@@ -77,7 +76,6 @@ export async function getOfficialPackages(
   if (officialPackages && !refresh) {
     return Promise.resolve(officialPackages);
   }
-  await findMsfsInstallPath();
   const rawPackages = await findPackages('official');
   officialPackages = parsePackageInfo(rawPackages, 'official');
   console.log('parsePackageInfo complete', packageVersions);

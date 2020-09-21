@@ -1,13 +1,8 @@
-import {
-  createRouter,
-  createWebHistory,
-  createWebHashHistory,
-  RouteRecordRaw
-} from 'vue-router';
 import Setup from '../views/Setup.vue';
 import Packages from '../views/Packages.vue';
+import VueRouter, { RouteConfig } from 'vue-router';
 
-const routes: Array<RouteRecordRaw> = [
+const routes: RouteConfig[] = [
   {
     path: '/setup',
     alias: '/',
@@ -21,10 +16,8 @@ const routes: Array<RouteRecordRaw> = [
   }
 ];
 
-const router = createRouter({
-  history: process.env.IS_ELECTRON
-    ? createWebHashHistory(process.env.BASE_URL)
-    : createWebHistory(process.env.BASE_URL),
+const router = new VueRouter({
+  mode: 'hash',
   routes
 });
 
