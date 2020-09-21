@@ -1,8 +1,11 @@
 <template>
-  <li class="package">
-    {{ pkg.title || pkg.directoryName }}
-    <span v-if="pkg.version">v{{ pkg.version }}</span>
-    <div class="unmet" v-if="unmetDeps.length > 0">
+  <li class="md-card md-ripple">
+    <div class="md-card-title">
+      <div class="md-title">{{ pkg.title || pkg.directoryName }}</div>
+      <div class="md-subhead">v{{ pkg.version }}</div>
+    </div>
+
+    <div class="unmet md-card-content" v-if="unmetDeps.length > 0">
       <div v-for="unmetDep in unmetDeps" :key="unmetDep.name">
         {{ unmetDep.name }} : expected {{ unmetDep.expected }}, got
         {{ unmetDep.loaded || 'missing' }}

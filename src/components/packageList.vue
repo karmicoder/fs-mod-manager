@@ -2,8 +2,8 @@
   <p v-if="packages && packages.length > 300">
     {{ packages.length }} installed packages
   </p>
-  <ul v-else class="packages" v-for="pkg in packages" :key="pkg.title">
-    <PackageListItem :pkg="pkg" />
+  <ul v-else class="packages">
+    <PackageListItem v-for="pkg in packages" :key="pkg.title" :pkg="pkg" />
   </ul>
 </template>
 <script lang="ts">
