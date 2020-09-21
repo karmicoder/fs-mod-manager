@@ -1,8 +1,11 @@
 module.exports = {
-  runtimeCompiler: process.env.NODE_ENV !== 'production',
-  pluginOptions: {
-    electronBuilder: {
-      preload: 'src/preload.js'
+  "runtimeCompiler": true,
+  "pluginOptions": {
+    "electronBuilder": {
+      "preload": "src/preload.js"
     }
-  }
-};
+  },
+  "transpileDependencies": [
+    "vuetify"
+  ]
+}

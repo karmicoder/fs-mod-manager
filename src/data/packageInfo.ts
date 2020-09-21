@@ -24,9 +24,7 @@ export interface PackageInfo {
 // do not modify outside of this file
 const packageVersions = new Map<string, string>();
 
-let communityPackages: PackageInfo[];
-let officialPackages: PackageInfo[];
-let inactivePackages: PackageInfo[];
+const packages = new Map<PackageLocation, PackageInfo[]>();
 
 function parsePackageInfo(
   rawObjs: [string, string][],
@@ -57,30 +55,18 @@ function parsePackageInfo(
   });
 }
 
-export async function getCommunityPackages(
+export async function getPackages(
+  location: PackageLocation,
   refresh = false
 ): Promise<PackageInfo[]> {
-  if (communityPackages && !refresh) {
-    return Promise.resolve(communityPackages);
+  const cached = packages.get(location);
+  if (cached && !refresh) {
+    return Promise.resolve(cached);
   }
-  const rawPackages = await findPackages('community');
-  communityPackages = parsePackageInfo(rawPackages, 'community');
-  console.log('parsePackageInfo complete', packageVersions);
-
-  return communityPackages;
-}
-
-export async function getOfficialPackages(
-  refresh = false
-): Promise<PackageInfo[]> {
-  if (officialPackages && !refresh) {
-    return Promise.resolve(officialPackages);
-  }
-  const rawPackages = await findPackages('official');
-  officialPackages = parsePackageInfo(rawPackages, 'official');
-  console.log('parsePackageInfo complete', packageVersions);
-
-  return officialPackages;
+  const rawPackages = await findPackages(location);
+  const parsedPackages = parsePackageInfo(rawPackages, location);
+  packages.set(location, parsedPackages);
+  return parsedPackages;
 }
 
 export function unmetDependencies(pkg: PackageInfo): UnmetPackageDependency[] {

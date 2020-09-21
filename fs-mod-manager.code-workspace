@@ -10,6 +10,7 @@
 		"editor.formatOnSave": true,
 		"editor.insertSpaces": true,
 		"editor.detectIndentation": false,
-		"eslint.lintTask.enable": true
+    "eslint.lintTask.enable": true,
+    "git.ignoreLimitWarning": true
 	  }
 }

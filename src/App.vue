@@ -1,25 +1,36 @@
 <template>
-  <div class="app"><router-view /></div>
+  <v-app>
+    <v-navigation-drawer mini-variant permanent>
+      <v-list dense nav class="py-0">
+        <v-list-item link to="/packages" exact="false"
+          ><v-icon>mdi-package-variant-closed</v-icon></v-list-item
+        >
+      </v-list>
+      <v-list dense nav class="py-0">
+        <v-list-item link to="/setup">
+          <v-icon>mdi-backup-restore</v-icon>
+        </v-list-item>
+      </v-list>
+    </v-navigation-drawer>
+
+    <v-main>
+      <v-container fluid>
+        <router-view></router-view>
+      </v-container>
+    </v-main>
+  </v-app>
 </template>
 <style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-
-#nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
+.v-application {
+  .v-application--wrap {
+    flex-direction: row;
   }
+
+  // .sidebar {
+  //   position: fixed;
+  //   top: 0;
+  //   bottom: 0;
+  //   width: 42px;
+  // }
 }
 </style>

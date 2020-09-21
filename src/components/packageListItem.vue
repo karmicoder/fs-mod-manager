@@ -1,17 +1,13 @@
 <template>
-  <li class="md-card md-ripple">
-    <div class="md-card-title">
-      <div class="md-title">{{ pkg.title || pkg.directoryName }}</div>
-      <div class="md-subhead">v{{ pkg.version }}</div>
-    </div>
+  <v-card outlined>
+    <v-card-title>{{ pkg.title || pkg.directoryName }}</v-card-title>
+    <v-card-subtitle>{{ pkg.version }}</v-card-subtitle>
 
-    <div class="unmet md-card-content" v-if="unmetDeps.length > 0">
-      <div v-for="unmetDep in unmetDeps" :key="unmetDep.name">
-        {{ unmetDep.name }} : expected {{ unmetDep.expected }}, got
-        {{ unmetDep.loaded || 'missing' }}
-      </div>
+    <div v-for="unmetDep in unmetDeps" :key="unmetDep.name">
+      {{ unmetDep.name }} : expected {{ unmetDep.expected }}, got
+      {{ unmetDep.loaded || 'missing' }}
     </div>
-  </li>
+  </v-card>
 </template>
 <script lang="ts">
 import {
@@ -19,6 +15,7 @@ import {
   unmetDependencies,
   UnmetPackageDependency
 } from '@/data/packageInfo';
+
 import Vue from 'vue';
 
 export default Vue.extend({
@@ -36,3 +33,4 @@ export default Vue.extend({
   }
 });
 </script>
+<style scoped></style>

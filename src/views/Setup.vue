@@ -2,13 +2,14 @@
   <div class="setup">
     <h1>Setup</h1>
     <p>MSFS install path: {{ msfsInstallPath }}</p>
-    <button
-      class="btn btn-primary"
+    <v-btn
+      depressed
+      color="primary"
       :disabled="msfsInstallPath === ''"
       @click="goToPackages"
     >
       Confirm
-    </button>
+    </v-btn>
   </div>
 </template>
 <script lang="ts">

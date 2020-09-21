@@ -1,21 +1,19 @@
 <template>
-  <div class="setup">
-    <h1>Packages</h1>
-    <h3>Official</h3>
-    <PackageList v-if="officialPackages" :packages="officialPackages" />
-    <h3>Community</h3>
+  <div class="packages">
+    <v-tabs @change="tabChanged">
+      <v-tab>Installed</v-tab>
+      <v-tab>Official</v-tab>
+      <v-tab>Inactive</v-tab>
+    </v-tabs>
     <PackageList v-if="packages" :packages="packages" />
   </div>
 </template>
 <script lang="ts">
 import Vue from 'vue';
-import {
-  getCommunityPackages,
-  getOfficialPackages,
-  PackageInfo
-} from '@/data/packageInfo';
 import PackageList from '@/components/packageList.vue';
+import { getPackages, PackageInfo, PackageLocation } from '@/data/packageInfo';
 
+const tabValues: PackageLocation[] = ['community', 'official', 'inactive'];
 // ipcRenderer.
 export default Vue.extend({
   components: {
@@ -24,14 +22,26 @@ export default Vue.extend({
   data() {
     return {
       packages: [] as PackageInfo[],
-      officialPackages: undefined as PackageInfo[] | undefined
+      location:
+        (this.$route.params.tab as PackageLocation) ||
+        ('community' as PackageLocation)
     };
   },
+  methods: {
+    tabChanged(tabIndex: number) {
+      this.location = tabValues[tabIndex];
+    }
+  },
+  watch: {
+    location(val: PackageLocation) {
+      getPackages(val).then(
+        (packages) => (this.packages = packages),
+        (err) => (this.packages = [])
+      );
+    }
+  },
   created() {
-    getOfficialPackages().then(
-      (packages) => (this.officialPackages = packages)
-    );
-    getCommunityPackages().then((packages) => (this.packages = packages));
+    getPackages(this.location).then((packages) => (this.packages = packages));
   }
 });
 </script>

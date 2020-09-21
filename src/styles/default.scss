@@ -1,12 +1,3 @@
-@import '~vue-material/dist/theme/engine'; // Import the theme engine
+// $color-pack: false;
 
-@include md-register-theme(
-  'default-dark',
-  (
-    primary: md-get-palette-color(blue, A200),
-    // The primary color of your application
-      accent: md-get-palette-color(red, A200) // The accent or secondary color
-  )
-);
-
-@import '~vue-material/dist/theme/all';
+@import '~vuetify/src/styles/main.sass';

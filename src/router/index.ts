@@ -10,7 +10,7 @@ const routes: RouteConfig[] = [
     component: Setup
   },
   {
-    path: '/packages',
+    path: '/packages/:tab?',
     name: 'Packages',
     component: Packages
   }
