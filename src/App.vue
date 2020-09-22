@@ -14,16 +14,22 @@
     </v-navigation-drawer>
 
     <v-main>
-      <v-container fluid>
-        <router-view></router-view>
-      </v-container>
+      <router-view></router-view>
     </v-main>
   </v-app>
 </template>
 <style lang="scss">
 .v-application {
   .v-application--wrap {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    width: 100%;
     flex-direction: row;
+    .v-main {
+      flex-grow: 1;
+      overflow-y: auto;
+    }
   }
 
   // .sidebar {

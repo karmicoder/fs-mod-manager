@@ -5,7 +5,9 @@
       <v-tab>Official</v-tab>
       <v-tab>Inactive</v-tab>
     </v-tabs>
-    <PackageList v-if="packages" :packages="packages" />
+    <v-content class="overflow-y-auto">
+      <PackageList v-if="packages" :packages="packages" />
+    </v-content>
   </div>
 </template>
 <script lang="ts">
@@ -45,3 +47,19 @@ export default Vue.extend({
   }
 });
 </script>
+<style lang="scss">
+.packages {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  flex-flow: column nowrap;
+  > .v-tabs {
+    flex-grow: 0;
+  }
+  > main {
+    flex: 1 1 auto;
+  }
+}
+</style>
