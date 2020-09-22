@@ -4,8 +4,8 @@ import router from './router';
 import Router from 'vue-router';
 import './styles/default.scss';
 import vuetify from './plugins/vuetify';
-import 'roboto-fontface/css/roboto/roboto-fontface.css'
-import '@mdi/font/css/materialdesignicons.css'
+import 'roboto-fontface/css/roboto/roboto-fontface.css';
+import '@mdi/font/css/materialdesignicons.css';
 
 Vue.use(Router);
 // import material from 'vue-material/dist/components';

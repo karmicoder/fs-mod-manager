@@ -1,12 +1,32 @@
 <template>
-  <div class="packages">
+  <div class="packages" v-if="!loading">
     <v-tabs @change="tabChanged">
-      <v-tab>Installed</v-tab>
-      <v-tab>Official</v-tab>
-      <v-tab>Inactive</v-tab>
+      <v-tab
+        >Installed
+        <v-badge
+          inline
+          v-if="packages.community"
+          :content="packages.community.length"
+        />
+      </v-tab>
+
+      <v-tab
+        >Official
+        <v-badge
+          inline
+          v-if="packages.official"
+          :content="packages.official.length"
+      /></v-tab>
+      <v-tab
+        >Inactive
+        <v-badge
+          inline
+          v-if="packages.inactive"
+          :content="packages.inactive.length.toLocaleString()"
+      /></v-tab>
     </v-tabs>
     <v-content class="overflow-y-auto">
-      <PackageList v-if="packages" :packages="packages" />
+      <PackageList v-if="packages" :packages="packages[location]" />
     </v-content>
   </div>
 </template>
@@ -23,27 +43,31 @@ export default Vue.extend({
   },
   data() {
     return {
-      packages: [] as PackageInfo[],
+      packages: {} as { [key: string]: PackageInfo[] },
       location:
         (this.$route.params.tab as PackageLocation) ||
-        ('community' as PackageLocation)
+        ('community' as PackageLocation),
+      loading: true
     };
   },
   methods: {
     tabChanged(tabIndex: number) {
       this.location = tabValues[tabIndex];
+    },
+    getPackages(refresh = false) {
+      Promise.all(
+        tabValues.map((loc) => {
+          return getPackages(loc, refresh).then(
+            (pkgs) => Vue.set(this.packages, loc, pkgs),
+            (err) => Vue.set(this.packages, loc, [])
+          );
+        })
+      ).finally(() => (this.loading = false));
     }
   },
-  watch: {
-    location(val: PackageLocation) {
-      getPackages(val).then(
-        (packages) => (this.packages = packages),
-        (err) => (this.packages = [])
-      );
-    }
-  },
+  watch: {},
   created() {
-    getPackages(this.location).then((packages) => (this.packages = packages));
+    this.getPackages();
   }
 });
 </script>

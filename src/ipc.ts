@@ -1,5 +1,5 @@
 import { IpcRenderer } from 'electron';
-import { PackageLocation } from './data/packageInfo';
+import { PackageInfo, PackageLocation } from './data/packageInfo';
 
 declare global {
   interface Window {
@@ -14,5 +14,9 @@ export function findMsfsInstallPath(): Promise<string> {
 export function findPackages(
   location: PackageLocation
 ): Promise<[string, string][]> {
-  return window.ipcRenderer.invoke('findCommunityPackages', location);
+  return window.ipcRenderer.invoke('findPackages', location);
+}
+
+export function backupPackage(pkg: PackageInfo): Promise<void> {
+  return window.ipcRenderer.invoke('backupPackage', pkg);
 }

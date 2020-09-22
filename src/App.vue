@@ -2,13 +2,13 @@
   <v-app>
     <v-navigation-drawer mini-variant permanent>
       <v-list dense nav class="py-0">
-        <v-list-item link to="/packages" exact="false"
+        <v-list-item link to="/packages" :exact="false"
           ><v-icon>mdi-package-variant-closed</v-icon></v-list-item
         >
       </v-list>
       <v-list dense nav class="py-0">
         <v-list-item link to="/setup">
-          <v-icon>mdi-backup-restore</v-icon>
+          <v-icon>mdi-plus</v-icon>
         </v-list-item>
       </v-list>
     </v-navigation-drawer>

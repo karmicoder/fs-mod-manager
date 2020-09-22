@@ -1,15 +1,14 @@
 'use strict';
-
 import { app, protocol, BrowserWindow, Menu, ipcMain } from 'electron';
-import * as fs from 'fs';
 import path from 'path';
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
-import './background/ipcServer';
+import './server/ipcServer';
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win: BrowserWindow | null;
+const localDataPath = path.join(process.env.LOCALAPPDATA as string, app.name);
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([

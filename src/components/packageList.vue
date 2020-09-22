@@ -1,8 +1,5 @@
 <template>
   <div class="packages">
-    <p v-if="packages && packages.length > 300">
-      {{ packages.length }} installed packages
-    </p>
     <div class="packages">
       <PackageListItem
         v-for="pkg in packages"
@@ -13,6 +10,7 @@
   </div>
 </template>
 <script lang="ts">
+import { PackageInfo } from '@/data/packageInfo';
 import Vue from 'vue';
 import PackageListItem from './packageListItem.vue';
 export default Vue.extend({
@@ -20,8 +18,7 @@ export default Vue.extend({
   name: 'PackageList',
   props: {
     packages: {
-      type: Array,
-      required: true
+      type: Array as () => PackageInfo[]
     }
   }
 });

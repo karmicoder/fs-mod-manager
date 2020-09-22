@@ -1,5 +1,5 @@
 import { findMsfsInstallPath, findPackages } from '@/ipc';
-
+import compareVersions from 'compare-versions';
 export type PackageLocation = 'official' | 'community' | 'inactive';
 export interface PackageDependency {
   name: string;
@@ -19,6 +19,7 @@ export interface PackageInfo {
   manufacturer: string;
   location: PackageLocation;
   directoryName: string;
+  size: number;
 }
 
 // do not modify outside of this file
@@ -47,10 +48,15 @@ function parsePackageInfo(
       contentType: rawObj.content_type as string,
       minimumGameVersion: rawObj.minimum_game_version as string,
       manufacturer: rawObj.manufacturer as string,
+      size: parseInt(rawObj.total_package_size as string),
       location,
       directoryName
     };
     packageVersions.set(directoryName, result.version);
+    // HACK: fix missing fs-base-propdefs
+    if (location === 'official' && directoryName === 'fs-base') {
+      packageVersions.set('fs-base-propdefs', result.version);
+    }
     return result;
   });
 }
@@ -64,7 +70,9 @@ export async function getPackages(
     return Promise.resolve(cached);
   }
   const rawPackages = await findPackages(location);
-  const parsedPackages = parsePackageInfo(rawPackages, location);
+  const parsedPackages = parsePackageInfo(rawPackages, location).sort((a, b) =>
+    (a.title || a.directoryName).localeCompare(b.title || b.directoryName)
+  );
   packages.set(location, parsedPackages);
   return parsedPackages;
 }
@@ -74,7 +82,10 @@ export function unmetDependencies(pkg: PackageInfo): UnmetPackageDependency[] {
     return [];
   }
   return pkg.dependencies
-    .filter((d) => d.version !== packageVersions.get(d.name))
+    .filter((d) => {
+      const loadedVersion = packageVersions.get(d.name);
+      return !loadedVersion || compareVersions(d.version, loadedVersion) > 0;
+    })
     .map((d) => {
       return {
         name: d.name,
