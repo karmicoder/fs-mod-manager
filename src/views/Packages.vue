@@ -25,9 +25,9 @@
           :content="packages.inactive.length.toLocaleString()"
       /></v-tab>
     </v-tabs>
-    <v-content class="overflow-y-auto">
+    <v-main class="overflow-y-auto">
       <PackageList v-if="packages" :packages="packages[location]" />
-    </v-content>
+    </v-main>
   </div>
 </template>
 <script lang="ts">
@@ -59,7 +59,7 @@ export default Vue.extend({
         tabValues.map((loc) => {
           return getPackages(loc, refresh).then(
             (pkgs) => Vue.set(this.packages, loc, pkgs),
-            (err) => Vue.set(this.packages, loc, [])
+            () => Vue.set(this.packages, loc, [])
           );
         })
       ).finally(() => (this.loading = false));
