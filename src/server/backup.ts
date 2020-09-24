@@ -1,9 +1,9 @@
 import { PackageInfo } from '@/data/packageInfo';
-import { getPackagePath } from './ipcServer';
 import * as path from 'path';
 import { promises as fs, existsSync, createWriteStream } from 'fs';
 import { app } from 'electron';
 import archiver from 'archiver';
+import { getPackagePath } from './packages';
 
 console.log('PROCESS ENV', process.env.LOCALAPPDATA, app.name);
 const localDataPath = path.join(process.env.LOCALAPPDATA as string, app.name);

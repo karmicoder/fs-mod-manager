@@ -1,12 +1,10 @@
 <template>
   <div class="packages">
-    <div class="packages">
-      <PackageListItem
-        v-for="pkg in packages"
-        :key="pkg.directoryName"
-        :pkg="pkg"
-      />
-    </div>
+    <PackageListItem
+      v-for="pkg in packages"
+      :key="pkg.directoryName"
+      :pkg="pkg"
+    />
   </div>
 </template>
 <script lang="ts">

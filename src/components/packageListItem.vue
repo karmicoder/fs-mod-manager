@@ -1,16 +1,22 @@
 <template>
   <v-card outlined>
-    <v-card-title>{{ pkg.title || pkg.directoryName }}</v-card-title>
+    <v-card-title
+      >{{ pkg.title || pkg.directoryName }}{{ ' ' }}
+      <v-icon v-if="unmetDeps.length > 0" style="float: right" color="warning"
+        >mdi-alert-circle</v-icon
+      >
+    </v-card-title>
     <v-card-subtitle
       >{{ pkg.version }}
       {{
         pkg.title && pkg.directoryName !== pkg.title ? pkg.directoryName : ''
       }}
-      {{ pkg.contentType }}</v-card-subtitle
-    >
-    <v-btn v-if="pkg.location === 'community'" @click="backup">
-      <v-icon>mdi-folder-upload</v-icon>
-    </v-btn>
+      <span v-if="!isNaN(pkg.size)">{{
+        bytes(pkg.size, { decimalPlaces: 0 })
+      }}</span>
+      {{ pkg.contentType }}
+    </v-card-subtitle>
+
     <div v-for="unmetDep in unmetDeps" :key="unmetDep.name">
       <span v-if="!unmetDep.loaded">missing {{ unmetDep.name }}</span>
       <span v-else>
@@ -18,9 +24,16 @@
         {{ unmetDep.loaded }}</span
       >
     </div>
-    <div v-if="!isNaN(pkg.size)">
-      {{ bytes(pkg.size, { decimalPlaces: 0 }) }}
-    </div>
+    <v-card-actions>
+      <BackupDialog :pkg="pkg"></BackupDialog>
+      <v-btn
+        v-if="pkg.location === 'community'"
+        color="alternate"
+        icon
+        title="Deactivate"
+        ><v-icon>mdi-archive</v-icon></v-btn
+      >
+    </v-card-actions>
   </v-card>
 </template>
 <script lang="ts">
@@ -29,13 +42,15 @@ import {
   unmetDependencies,
   UnmetPackageDependency
 } from '@/data/packageInfo';
-import { backupPackage } from '@/ipc';
 import bytes from 'bytes';
-
+import BackupDialog from '@/components/backupDialog.vue';
 import Vue from 'vue';
 
 export default Vue.extend({
   name: 'PackageListItem',
+  components: {
+    BackupDialog
+  },
   props: {
     pkg: {
       type: Object as () => PackageInfo,
@@ -43,12 +58,6 @@ export default Vue.extend({
     }
   },
   methods: {
-    backup() {
-      backupPackage(this.pkg).then(
-        () => console.log('backed it up!'),
-        (err) => console.error('fucked up the backup', err)
-      );
-    },
     bytes
   },
   computed: {

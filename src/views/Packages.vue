@@ -14,12 +14,14 @@
         >Official
         <v-badge
           inline
+          color="green"
           v-if="packages.official"
           :content="packages.official.length"
       /></v-tab>
       <v-tab
         >Inactive
         <v-badge
+          color="grey"
           inline
           v-if="packages.inactive"
           :content="packages.inactive.length.toLocaleString()"

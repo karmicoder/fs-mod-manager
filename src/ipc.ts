@@ -1,5 +1,10 @@
 import { IpcRenderer } from 'electron';
-import { PackageInfo, PackageLocation } from './data/packageInfo';
+import {
+  ImportInfo,
+  ImportPackageInfo,
+  PackageInfo,
+  PackageLocation
+} from './data/packageInfo';
 
 declare global {
   interface Window {
@@ -19,4 +24,16 @@ export function findPackages(
 
 export function backupPackage(pkg: PackageInfo): Promise<void> {
   return window.ipcRenderer.invoke('backupPackage', pkg);
+}
+
+export function selectImportFile(): Promise<string> {
+  return window.ipcRenderer.invoke('selectImportFile');
+}
+
+export function parseImportFile(archive: string): Promise<ImportInfo> {
+  return window.ipcRenderer.invoke('parseImportFile', archive);
+}
+
+export function importPackages(pkgs: ImportPackageInfo[]): Promise<void> {
+  return window.ipcRenderer.invoke('importPackages', pkgs);
 }

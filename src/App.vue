@@ -7,6 +7,11 @@
         >
       </v-list>
       <v-list dense nav class="py-0">
+        <v-list-item link to="/import"
+          ><v-icon x-large>mdi-file-import</v-icon></v-list-item
+        >
+      </v-list>
+      <v-list dense nav class="py-0">
         <v-list-item link to="/setup">
           <v-icon x-large>mdi-wrench</v-icon>
         </v-list-item>
