@@ -4,7 +4,7 @@ import {
   ImportPackageInfo,
   PackageInfo,
   PackageLocation
-} from './data/packageInfo';
+} from './types/packageInfo';
 
 declare global {
   interface Window {
@@ -36,4 +36,8 @@ export function parseImportFile(archive: string): Promise<ImportInfo> {
 
 export function importPackages(pkgs: ImportPackageInfo[]): Promise<void> {
   return window.ipcRenderer.invoke('importPackages', pkgs);
+}
+
+export function deactivatePackage(pkg: PackageInfo) {
+  return window.ipcRenderer.invoke('deactivatePackage', pkg.directoryName);
 }

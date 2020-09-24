@@ -1,8 +1,9 @@
+import { PackageInfo, PackageLocation } from '@/types/packageInfo';
 import { existsSync, promises as fs } from 'fs';
+import ncp from 'ncp';
 import * as path from 'path';
 
-import { PackageLocation } from '@/data/packageInfo';
-import { localDataPath } from './localData';
+import { inactivePath, localDataPath } from './localData';
 
 const possibleInstallPaths = [
   process.env.LOCALAPPDATA +
@@ -71,4 +72,26 @@ export async function findPackages(location: PackageLocation) {
   );
 
   return manifests;
+}
+
+export async function deactivatePackage(pkgDirectory: string): Promise<void> {
+  const fromDir = path.join(getPackagePath('community'), pkgDirectory);
+  const toDir = path.join(localDataPath, inactivePath, pkgDirectory);
+  if (existsSync(toDir)) {
+    await fs.rmdir(toDir, { recursive: true });
+  }
+  return new Promise((resolve, reject) => {
+    ncp(fromDir, toDir, (err) => {
+      if (err) {
+        reject(err);
+      } else {
+        fs.rmdir(fromDir, { recursive: true }).then(
+          () => {
+            resolve();
+          },
+          (err) => reject(err)
+        );
+      }
+    });
+  });
 }

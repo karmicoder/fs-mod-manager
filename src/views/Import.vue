@@ -42,10 +42,11 @@
   </v-stepper>
 </template>
 <script lang="ts">
-import { clearPackageInfo, ImportInfo, PackageInfo } from '@/data/packageInfo';
+import { clearPackageInfo } from '@/data/packageInfo';
 import { selectImportFile, parseImportFile, importPackages } from '@/ipc';
 import Vue from 'vue';
 import PackageList from '@/components/packageList.vue';
+import { ImportInfo, PackageInfo } from '@/types/packageInfo';
 
 export default Vue.extend({
   name: 'Import',

@@ -31,20 +31,19 @@
         color="alternate"
         icon
         title="Deactivate"
+        @click="deactivate"
         ><v-icon>mdi-archive</v-icon></v-btn
       >
     </v-card-actions>
   </v-card>
 </template>
 <script lang="ts">
-import {
-  PackageInfo,
-  unmetDependencies,
-  UnmetPackageDependency
-} from '@/data/packageInfo';
+import { unmetDependencies } from '@/data/packageInfo';
 import bytes from 'bytes';
 import BackupDialog from '@/components/backupDialog.vue';
 import Vue from 'vue';
+import { PackageInfo, UnmetPackageDependency } from '@/types/packageInfo';
+import { deactivatePackage } from '@/ipc';
 
 export default Vue.extend({
   name: 'PackageListItem',
@@ -58,7 +57,12 @@ export default Vue.extend({
     }
   },
   methods: {
-    bytes
+    bytes,
+    deactivate() {
+      deactivatePackage(this.pkg).then(() =>
+        this.$emit('deactivated', this.pkg)
+      );
+    }
   },
   computed: {
     unmetDeps(): UnmetPackageDependency[] {

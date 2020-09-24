@@ -4,11 +4,12 @@
       v-for="pkg in packages"
       :key="pkg.directoryName"
       :pkg="pkg"
+      @deactivated="deactivated"
     />
   </div>
 </template>
 <script lang="ts">
-import { PackageInfo } from '@/data/packageInfo';
+import { PackageInfo } from '@/types/packageInfo';
 import Vue from 'vue';
 import PackageListItem from './packageListItem.vue';
 export default Vue.extend({
@@ -17,6 +18,11 @@ export default Vue.extend({
   props: {
     packages: {
       type: Array as () => PackageInfo[]
+    }
+  },
+  methods: {
+    deactivated(pkg: PackageInfo) {
+      this.$emit('deactivated', pkg);
     }
   }
 });

@@ -21,21 +21,34 @@
       <v-tab
         >Inactive
         <v-badge
-          color="grey"
+          color="primary"
           inline
           v-if="packages.inactive"
           :content="packages.inactive.length.toLocaleString()"
       /></v-tab>
+      <v-spacer />
+      <v-btn
+        color="accent"
+        icon
+        title="Force Refresh"
+        @click="getPackages(true)"
+        ><v-icon>mdi-refresh</v-icon></v-btn
+      >
     </v-tabs>
     <v-main class="overflow-y-auto">
-      <PackageList v-if="packages" :packages="packages[location]" />
+      <PackageList
+        v-if="packages"
+        :packages="packages[location]"
+        @deactivated="packageDeactivated"
+      />
     </v-main>
   </div>
 </template>
 <script lang="ts">
 import Vue from 'vue';
 import PackageList from '@/components/packageList.vue';
-import { getPackages, PackageInfo, PackageLocation } from '@/data/packageInfo';
+import { getPackages } from '@/data/packageInfo';
+import { PackageInfo, PackageLocation } from '@/types/packageInfo';
 
 const tabValues: PackageLocation[] = ['community', 'official', 'inactive'];
 // ipcRenderer.
@@ -65,6 +78,18 @@ export default Vue.extend({
           );
         })
       ).finally(() => (this.loading = false));
+    },
+    packageDeactivated(pkg: PackageInfo) {
+      // remove from community
+      Vue.set(
+        this.packages,
+        'community',
+        this.packages.community.filter(
+          (p) => p.directoryName !== pkg.directoryName
+        )
+      );
+      // add to inactive
+      Vue.set(this.packages, 'inactive', this.packages.inactive.concat([pkg]));
     }
   },
   watch: {},
@@ -83,6 +108,9 @@ export default Vue.extend({
   flex-flow: column nowrap;
   > .v-tabs {
     flex-grow: 0;
+    .v-btn {
+      align-self: center;
+    }
   }
   > main {
     flex: 1 1 auto;
