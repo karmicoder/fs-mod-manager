@@ -24,7 +24,9 @@ ipcMain.handle('backupPackage', (ev, pkg: PackageInfo) => backupPackage(pkg));
 
 ipcMain.handle('selectImportFile', selectImportFile);
 ipcMain.handle('parseImportFile', (ev, archivePath: string) =>
-  parseImportFile(archivePath)
+  parseImportFile(archivePath, (percent) => {
+    ev.sender.send('unarchive_progress', percent);
+  })
 );
 ipcMain.handle('importPackages', (ev, pkgs: ImportPackageInfo[]) =>
   importPackages(pkgs)

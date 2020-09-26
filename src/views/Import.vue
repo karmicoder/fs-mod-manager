@@ -22,9 +22,10 @@
       </v-stepper-content>
       <v-stepper-content step="2">
         <span v-if="!importInfo"
-          >Extracting files {{ this.archivePath }}...</span
+          >Extracting files {{ this.archivePath }}...
+          {{ unarchiveProgress }}</span
         >
-        <v-progress-linear indeterminate />
+        <v-progress-linear v-model="unarchiveProgress" />
       </v-stepper-content>
       <v-stepper-content step="3">
         <PackageList v-if="importInfo" :packages="importPackages" />
@@ -47,17 +48,26 @@ import { selectImportFile, parseImportFile, importPackages } from '@/ipc';
 import Vue from 'vue';
 import PackageList from '@/components/packageList.vue';
 import { ImportInfo, PackageInfo } from '@/types/packageInfo';
+// import { ipcRenderer } from 'electron';
 
 export default Vue.extend({
   name: 'Import',
   components: {
     PackageList
   },
+  created() {
+    console.log('import created');
+    window.ipcRenderer.on('unarchive_progress', (ev, percent: number) => {
+      console.log('unarchive_progress', percent);
+      this.unarchiveProgress = percent;
+    });
+  },
   data() {
     return {
       step: 1,
       archivePath: undefined as string | undefined,
-      importInfo: undefined as ImportInfo | undefined
+      importInfo: undefined as ImportInfo | undefined,
+      unarchiveProgress: 0
     };
   },
   methods: {
@@ -86,10 +96,12 @@ export default Vue.extend({
   watch: {
     step: function(newVal) {
       if (newVal === 2 && this.archivePath) {
-        parseImportFile(this.archivePath).then((importInfo) => {
-          this.importInfo = importInfo;
-          this.step = 3;
-        });
+        parseImportFile(this.archivePath)
+          .then((importInfo) => {
+            this.importInfo = importInfo;
+            this.step = 3;
+          })
+          .finally(() => (this.unarchiveProgress = 0));
       }
     }
   }

@@ -1,4 +1,4 @@
-import { PackageInfo, PackageLocation } from '@/types/packageInfo';
+import { PackageLocation } from '@/types/packageInfo';
 import { existsSync, promises as fs } from 'fs';
 import ncp from 'ncp';
 import * as path from 'path';

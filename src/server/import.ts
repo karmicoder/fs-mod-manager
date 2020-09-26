@@ -1,16 +1,17 @@
-import { app, dialog } from 'electron';
-import decompress from 'decompress';
+import { app, dialog, ipcMain } from 'electron';
 import path from 'path';
 import { existsSync, promises as fs } from 'fs';
 import tmp from 'tmp';
+
+import { getPackagePath } from './packages';
+import ncp from 'ncp';
 import {
   ImportInfo,
   ImportPackageInfo,
-  PackageInfo,
-  parsePackageInfo
-} from '@/data/packageInfo';
-import { getPackagePath } from './packages';
-import ncp from 'ncp';
+  PackageInfo
+} from '@/types/packageInfo';
+import { unarchive } from './archive';
+import { parsePackageInfo } from '@/data/packageInfo';
 
 let tmpDir: tmp.DirResult | undefined;
 
@@ -66,12 +67,13 @@ export async function findManifests(
 }
 
 export async function parseImportFile(
-  archivePath: string
+  archivePath: string,
+  onProgress: (percent: number) => void
 ): Promise<ImportInfo> {
   cleanupTmpDir();
   tmpDir = tmp.dirSync();
   const tmpName = tmpDir.name;
-  const files = await decompress(archivePath, tmpName);
+  await unarchive(archivePath, tmpName, onProgress);
   // console.log('extracted files', files);
   const manifests = await findManifests(tmpName);
   return { importPath: tmpName, packages: manifests };

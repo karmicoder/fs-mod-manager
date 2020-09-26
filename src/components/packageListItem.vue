@@ -25,6 +25,7 @@
       >
     </div>
     <v-card-actions>
+      <v-spacer />
       <BackupDialog :pkg="pkg"></BackupDialog>
       <v-btn
         v-if="pkg.location === 'community'"
