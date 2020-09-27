@@ -13,7 +13,6 @@
   },
   "main": "background.js",
   "dependencies": {
-    "7zip-bin": "^5.0.3",
     "@mdi/font": "^3.6.95",
     "bytes": "^3.1.0",
     "compare-versions": "^3.6.0",
@@ -23,7 +22,8 @@
     "tmp": "^0.2.1",
     "vue": "2.6.12",
     "vue-router": "^3.2.0",
-    "vuetify": "^2.2.11"
+    "vuetify": "^2.2.11",
+    "win-7zip": "^0.1.1"
   },
   "devDependencies": {
     "@types/bytes": "^3.1.0",

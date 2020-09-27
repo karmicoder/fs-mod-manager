@@ -7,6 +7,7 @@ import vuetify from './plugins/vuetify';
 import 'roboto-fontface/css/roboto/roboto-fontface.css';
 import '@mdi/font/css/materialdesignicons.css';
 
+console.log('NODE_ENV', process.env.NODE_ENV);
 Vue.use(Router);
 // import material from 'vue-material/dist/components';
 // import 'vue-material/dist/vue-material.min.css';

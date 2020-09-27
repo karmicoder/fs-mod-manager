@@ -18,7 +18,9 @@ let tmpDir: tmp.DirResult | undefined;
 export async function selectImportFile(): Promise<string> {
   const result = await dialog.showOpenDialog({
     defaultPath: app.getPath('downloads'),
-    filters: [{ name: 'Package Archives', extensions: ['zip'] }],
+    filters: [
+      { name: 'Package Archives', extensions: ['zip', 'rar', '7z', 'tar.gz'] }
+    ],
     properties: ['openFile']
   });
   return result.filePaths[0];

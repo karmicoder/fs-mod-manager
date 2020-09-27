@@ -2,7 +2,7 @@
 # yarn lockfile v1
 
 
-"7zip-bin@^5.0.3", "7zip-bin@~5.0.3":
+"7zip-bin@~5.0.3":
   version "5.0.3"
   resolved "https://registry.yarnpkg.com/7zip-bin/-/7zip-bin-5.0.3.tgz#bc5b5532ecafd923a61f2fb097e3b108c0106a3f"
   integrity sha512-GLyWIFBbGvpKPGo55JyRZAo4lVbnBiD52cKlw/0Vt+wnmKvWJkpZvsjVoaIolyBXDeAQKSicRtqFNPem9w0WYA==
@@ -12084,6 +12084,11 @@ widest-line@^3.1.0:
   integrity sha512-NsmoXalsWVDMGupxZ5R08ka9flZjjiLvHVAWYOKtiKM8ujtZWr9cRffak+uSE48+Ob8ObalXpwyeUiyDD6QFgg==
   dependencies:
     string-width "^4.0.0"
+
+win-7zip@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/win-7zip/-/win-7zip-0.1.1.tgz#14553f6dc56003d9a172f1fb5c488c7f167ec7de"
+  integrity sha1-FFU/bcVgA9mhcvH7XEiMfxZ+x94=
 
 word-wrap@~1.2.3:
   version "1.2.3"

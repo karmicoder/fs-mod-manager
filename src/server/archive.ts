@@ -1,8 +1,15 @@
-import sevenBin from '7zip-bin';
-
 import Seven from 'node-7z';
+import { app } from 'electron';
+import path from 'path';
 
-const pathTo7zip = sevenBin.path7za;
+const pathTo7zip =
+  process.env.NODE_ENV !== 'production'
+    ? path.join(
+        app.getAppPath(),
+        '..\\node_modules\\win-7zip\\7zip-lite\\7z.exe'
+      )
+    : '7z.exe';
+console.log('7zip path: ' + pathTo7zip);
 
 export function archive(
   fromPath: string,

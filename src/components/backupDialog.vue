@@ -44,8 +44,8 @@
   </v-dialog>
 </template>
 <script lang="ts">
-import { PackageInfo } from '@/data/packageInfo';
 import { backupPackage } from '@/ipc';
+import { PackageInfo } from '@/types/packageInfo';
 import bytes from 'bytes';
 import Vue from 'vue';
 export default Vue.extend({
