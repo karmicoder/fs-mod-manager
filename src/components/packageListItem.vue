@@ -2,9 +2,20 @@
   <v-card outlined>
     <v-card-title
       >{{ pkg.title || pkg.directoryName }}{{ ' ' }}
-      <v-icon v-if="unmetDeps.length > 0" style="float: right" color="warning"
-        >mdi-alert-circle</v-icon
-      >
+      <v-tooltip bottom v-if="unmetDeps.length > 0">
+        <template v-slot:activator="{ on, attrs }"
+          ><v-icon size="medium" v-bind="attrs" v-on="on" color="warning"
+            >mdi-alert-circle</v-icon
+          >
+        </template>
+        <div v-for="unmetDep in unmetDeps" :key="unmetDep.name">
+          <span v-if="!unmetDep.loaded">missing {{ unmetDep.name }}</span>
+          <span v-else>
+            {{ unmetDep.name }} : expected {{ unmetDep.expected }}, got
+            {{ unmetDep.loaded }}</span
+          >
+        </div>
+      </v-tooltip>
     </v-card-title>
     <v-card-subtitle
       >{{ pkg.version }}
@@ -17,13 +28,6 @@
       {{ pkg.contentType }}
     </v-card-subtitle>
 
-    <div v-for="unmetDep in unmetDeps" :key="unmetDep.name">
-      <span v-if="!unmetDep.loaded">missing {{ unmetDep.name }}</span>
-      <span v-else>
-        {{ unmetDep.name }} : expected {{ unmetDep.expected }}, got
-        {{ unmetDep.loaded }}</span
-      >
-    </div>
     <v-card-actions>
       <v-spacer />
       <BackupDialog :pkg="pkg"></BackupDialog>
