@@ -85,6 +85,7 @@ async function installPackage(pkg: ImportPackageInfo) {
   const fromPath = pkg[0];
   const toPath = path.join(getPackagePath('community'), pkg[1].directoryName);
   if (existsSync(toPath)) {
+    console.log('install: toPath exists, removing...', toPath);
     await fs.rmdir(toPath, { recursive: true });
   }
   return new Promise((resolve, reject) => {
@@ -92,6 +93,7 @@ async function installPackage(pkg: ImportPackageInfo) {
       if (err) {
         reject(err);
       } else {
+        console.log('install copy comand complete', fromPath, toPath);
         resolve();
       }
     });
@@ -100,6 +102,7 @@ async function installPackage(pkg: ImportPackageInfo) {
 export async function importPackages(pkgs: ImportPackageInfo[]): Promise<void> {
   await Promise.all(pkgs.map((p) => installPackage(p)));
   await cleanupTmpDir();
+  return;
 }
 
 process.on('exit', cleanupTmpDir);

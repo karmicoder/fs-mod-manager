@@ -20,6 +20,7 @@
 
     <v-main>
       <router-view></router-view>
+      <Snack />
     </v-main>
   </v-app>
 </template>
@@ -45,3 +46,11 @@
   // }
 }
 </style>
+<script lang="ts">
+import Vue from 'vue';
+import Snack from '@/components/snack.vue';
+export default Vue.extend({
+  name: 'App',
+  components: { Snack }
+});
+</script>

@@ -1,5 +1,5 @@
 <template>
-  <div class="packages" v-if="!loading">
+  <div class="page-packages" v-if="!loading">
     <v-tabs @change="tabChanged">
       <v-tab
         >Installed
@@ -70,6 +70,10 @@ export default Vue.extend({
       this.location = tabValues[tabIndex];
     },
     getPackages(refresh = false) {
+      if (refresh) {
+        this.packages = {};
+      }
+      this.loading = true;
       Promise.all(
         tabValues.map((loc) => {
           return getPackages(loc, refresh).then(
@@ -99,7 +103,7 @@ export default Vue.extend({
 });
 </script>
 <style lang="scss">
-.packages {
+.page-packages {
   position: absolute;
   top: 0;
   bottom: 0;

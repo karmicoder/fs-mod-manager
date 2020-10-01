@@ -63,11 +63,12 @@ export async function findPackages(location: PackageLocation) {
 
   const manifests = await Promise.all(
     packageDirs.map(async (pd) => {
-      const rawFileContent = await fs.readFile(
-        path.join(packageDirPath, pd, 'manifest.json'),
-        'utf-8'
-      );
-      return [pd, rawFileContent];
+      const manifestPath = path.join(packageDirPath, pd, 'manifest.json');
+      if (existsSync(manifestPath)) {
+        const rawFileContent = await fs.readFile(manifestPath, 'utf-8');
+        return [pd, rawFileContent];
+      }
+      return [pd, ''];
     })
   );
 

@@ -27,17 +27,25 @@
         >
         <v-progress-linear v-model="unarchiveProgress" />
       </v-stepper-content>
-      <v-stepper-content step="3">
-        <PackageList v-if="importInfo" :packages="importPackages" />
-        <v-btn color="green" @click="install">
-          <v-icon @click="install">mdi-file-import</v-icon> Install
-        </v-btn>
-        <pre v-if="importPackages">{{
-          JSON.stringify(importInfo, null, 2)
-        }}</pre>
+      <v-stepper-content step="3" class="step-3">
+        <v-container>
+          <v-btn color="green white--text" @click="install">
+            <v-icon @click="install">mdi-file-import</v-icon> Install
+          </v-btn>
+          <PackageList
+            v-if="importInfo"
+            :packages="importPackages"
+            selectable
+          />
+
+          <pre v-if="importPackages">{{
+            JSON.stringify(importInfo, null, 2)
+          }}</pre>
+        </v-container>
       </v-stepper-content>
       <v-stepper-content step="4">
-        <h1>Install Successful</h1>
+        <h1>Installing Packages...</h1>
+        <v-progress-linear indeterminate />
       </v-stepper-content>
     </v-stepper-items>
   </v-stepper>
@@ -48,6 +56,7 @@ import { selectImportFile, parseImportFile, importPackages } from '@/ipc';
 import Vue from 'vue';
 import PackageList from '@/components/packageList.vue';
 import { ImportInfo, PackageInfo } from '@/types/packageInfo';
+import { errorSnack, successSnack } from '@/components/snack.vue';
 // import { ipcRenderer } from 'electron';
 
 export default Vue.extend({
@@ -81,10 +90,19 @@ export default Vue.extend({
     },
     install() {
       if (this.importInfo) {
-        importPackages(this.importInfo.packages).then(() => {
-          clearPackageInfo();
-          this.step = 4;
-        });
+        this.step = 4;
+        const numPackages = this.importInfo.packages.length;
+        console.log('importing...');
+        importPackages(this.importInfo.packages).then(
+          () => {
+            successSnack(numPackages + ' packages imported');
+            clearPackageInfo();
+            this.$router.push('/packages');
+          },
+          (err) => {
+            errorSnack('failed to import packages', err);
+          }
+        );
       }
     }
   },
@@ -116,6 +134,14 @@ export default Vue.extend({
   > .v-stepper__content > .v-stepper__wrapper {
     > .v-card {
       flex-grow: 1;
+    }
+  }
+  .step-3 > .v-stepper__wrapper {
+    display: flex;
+    flex-flow: column nowrap;
+
+    .packages {
+      position: relative;
     }
   }
 }

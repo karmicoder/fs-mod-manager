@@ -48,6 +48,7 @@ import { backupPackage } from '@/ipc';
 import { PackageInfo } from '@/types/packageInfo';
 import bytes from 'bytes';
 import Vue from 'vue';
+import { errorSnack, successSnack } from './snack.vue';
 export default Vue.extend({
   name: 'BackupDialog',
   props: {
@@ -69,8 +70,15 @@ export default Vue.extend({
           () => {
             this.saved = true;
             this.dialog = false;
+            successSnack(
+              (this.pkg.title || this.pkg.directoryName) + ' Backed Up'
+            );
           },
-          (err) => console.error('fucked up the backup', err)
+          (err) =>
+            errorSnack(
+              'Unable to back up ' + (this.pkg.title || this.pkg.directoryName),
+              err
+            )
         )
         .finally(() => (this.saving = false));
     },

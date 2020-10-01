@@ -5,6 +5,7 @@
       :key="pkg.directoryName"
       :pkg="pkg"
       @deactivated="deactivated"
+      :selectable="selectable"
     />
   </div>
 </template>
@@ -18,6 +19,10 @@ export default Vue.extend({
   props: {
     packages: {
       type: Array as () => PackageInfo[]
+    },
+    selectable: {
+      type: Boolean,
+      default: false
     }
   },
   methods: {
