@@ -95,7 +95,7 @@ export default Vue.extend({
         console.log('importing...');
         importPackages(this.importInfo.packages).then(
           () => {
-            successSnack(numPackages + ' packages imported');
+            successSnack(numPackages + ' package(s) imported');
             clearPackageInfo();
             this.$router.push('/packages');
           },

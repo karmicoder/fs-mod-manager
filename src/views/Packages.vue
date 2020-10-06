@@ -40,6 +40,7 @@
         v-if="packages"
         :packages="packages[location]"
         @deactivated="packageDeactivated"
+        @activated="packageActivated"
       />
     </v-main>
   </div>
@@ -47,7 +48,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import PackageList from '@/components/packageList.vue';
-import { getPackages } from '@/data/packageInfo';
+import { getPackages, packageNameComparator } from '@/data/packageInfo';
 import { PackageInfo, PackageLocation } from '@/types/packageInfo';
 
 const tabValues: PackageLocation[] = ['community', 'official', 'inactive'];
@@ -93,7 +94,27 @@ export default Vue.extend({
         )
       );
       // add to inactive
-      Vue.set(this.packages, 'inactive', this.packages.inactive.concat([pkg]));
+      Vue.set(
+        this.packages,
+        'inactive',
+        this.packages.inactive.concat([pkg]).sort(packageNameComparator)
+      );
+    },
+    packageActivated(pkg: PackageInfo) {
+      // remove from inactive
+      Vue.set(
+        this.packages,
+        'inactive',
+        this.packages.inactive.filter(
+          (p) => p.directoryName !== pkg.directoryName
+        )
+      );
+      // add to active
+      Vue.set(
+        this.packages,
+        'active',
+        this.packages.active.concat([pkg]).sort(packageNameComparator)
+      );
     }
   },
   watch: {},

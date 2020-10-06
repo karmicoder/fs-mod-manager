@@ -51,6 +51,10 @@ function parsePackages(
   );
 }
 
+export function packageNameComparator(a: PackageInfo, b: PackageInfo): number {
+  return (a.title || a.directoryName).localeCompare(b.title || b.directoryName);
+}
+
 export async function getPackages(
   location: PackageLocation,
   refresh = false
@@ -60,8 +64,8 @@ export async function getPackages(
     return Promise.resolve(cached);
   }
   const rawPackages = await findPackages(location);
-  const parsedPackages = parsePackages(rawPackages, location).sort((a, b) =>
-    (a.title || a.directoryName).localeCompare(b.title || b.directoryName)
+  const parsedPackages = parsePackages(rawPackages, location).sort(
+    packageNameComparator
   );
   packages.set(location, parsedPackages);
   return parsedPackages;

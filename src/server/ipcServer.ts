@@ -10,15 +10,21 @@ import { importPackages, parseImportFile, selectImportFile } from './import';
 import {
   findMsfsInstallPath,
   findPackages,
-  deactivatePackage
+  deactivatePackage,
+  activatePackage,
+  verifySetup
 } from './packages';
 
 ipcMain.handle('findMsfsInstallPath', findMsfsInstallPath);
+ipcMain.handle('verifySetup', verifySetup);
 ipcMain.handle('findPackages', (ev, location: PackageLocation) =>
   findPackages(location)
 );
 ipcMain.handle('deactivatePackage', (ev, pkgDirectory: string) =>
   deactivatePackage(pkgDirectory)
+);
+ipcMain.handle('activatePackage', (ev, pkgDirectory: string) =>
+  activatePackage(pkgDirectory)
 );
 ipcMain.handle('backupPackage', (ev, pkg: PackageInfo) => backupPackage(pkg));
 

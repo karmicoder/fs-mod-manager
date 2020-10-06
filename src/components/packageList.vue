@@ -5,6 +5,7 @@
       :key="pkg.directoryName"
       :pkg="pkg"
       @deactivated="deactivated"
+      @activated="activated"
       :selectable="selectable"
     />
   </div>
@@ -28,6 +29,9 @@ export default Vue.extend({
   methods: {
     deactivated(pkg: PackageInfo) {
       this.$emit('deactivated', pkg);
+    },
+    activated(pkg: PackageInfo) {
+      this.$emit('activated', pkg);
     }
   }
 });

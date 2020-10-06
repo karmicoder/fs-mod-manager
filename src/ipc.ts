@@ -12,6 +12,9 @@ declare global {
   }
 }
 
+export function verifySetup(): Promise<boolean> {
+  return window.ipcRenderer.invoke('verifySetup');
+}
 export function findMsfsInstallPath(): Promise<string> {
   return window.ipcRenderer.invoke('findMsfsInstallPath');
 }
@@ -40,4 +43,8 @@ export function importPackages(pkgs: ImportPackageInfo[]): Promise<void> {
 
 export function deactivatePackage(pkg: PackageInfo) {
   return window.ipcRenderer.invoke('deactivatePackage', pkg.directoryName);
+}
+
+export function activatePackage(pkg: PackageInfo) {
+  return window.ipcRenderer.invoke('activatePackage', pkg.directoryName);
 }

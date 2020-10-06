@@ -23,7 +23,8 @@
     "vue": "2.6.12",
     "vue-router": "^3.2.0",
     "vuetify": "^2.2.11",
-    "win-7zip": "^0.1.1"
+    "win-7zip": "^0.1.1",
+    "winston": "^3.3.3"
   },
   "devDependencies": {
     "@types/bytes": "^3.1.0",

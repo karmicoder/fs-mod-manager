@@ -50,6 +50,11 @@ export function findMsfsInstallPath(): Promise<string> {
   });
 }
 
+export async function verifySetup(): Promise<boolean> {
+  const installPath = await findMsfsInstallPath();
+  return existsSync(installPath);
+}
+
 export async function findPackages(location: PackageLocation) {
   const packageDirPath = getPackagePath(location);
 
@@ -92,6 +97,25 @@ export async function deactivatePackage(pkgDirectory: string): Promise<void> {
           },
           (err) => reject(err)
         );
+      }
+    });
+  });
+}
+
+export async function activatePackage(pkgDirectory: string) {
+  const fromDir = path.join(localDataPath, inactivePath, pkgDirectory);
+  const toDir = path.join(getPackagePath('community'), pkgDirectory);
+  if (existsSync(toDir)) {
+    throw new Error(
+      'Active package with directory "' + pkgDirectory + '" already exists'
+    );
+  }
+  return new Promise((resolve, reject) => {
+    ncp(fromDir, toDir, (err) => {
+      if (err) {
+        reject(err);
+      } else {
+        fs.rmdir(fromDir, { recursive: true }).then(resolve, reject);
       }
     });
   });

@@ -44,8 +44,17 @@
           icon
           title="Deactivate"
           @click="deactivate"
-          ><v-icon>mdi-archive</v-icon></v-btn
+          ><v-icon>mdi-clipboard-arrow-right</v-icon>
+        </v-btn>
+        <v-btn
+          v-if="pkg.location === 'inactive'"
+          color="primary"
+          icon
+          title="Activate"
+          @click="activate"
         >
+          <v-icon>mdi-clipboard-arrow-left</v-icon>
+        </v-btn>
       </v-card-actions>
     </v-container>
   </v-card>
@@ -56,7 +65,8 @@ import bytes from 'bytes';
 import BackupDialog from '@/components/backupDialog.vue';
 import Vue from 'vue';
 import { PackageInfo, UnmetPackageDependency } from '@/types/packageInfo';
-import { deactivatePackage } from '@/ipc';
+import { activatePackage, deactivatePackage } from '@/ipc';
+import { errorSnack, successSnack } from './snack.vue';
 
 export default Vue.extend({
   name: 'PackageListItem',
@@ -80,8 +90,29 @@ export default Vue.extend({
   methods: {
     bytes,
     deactivate() {
-      deactivatePackage(this.pkg).then(() =>
-        this.$emit('deactivated', this.pkg)
+      deactivatePackage(this.pkg).then(
+        () => {
+          successSnack(
+            (this.pkg.title || this.pkg.directoryName) + ' deactivated'
+          );
+          this.$emit('deactivated', this.pkg);
+        },
+        (err) => {
+          errorSnack('Failed to deactivate package', err);
+        }
+      );
+    },
+    activate() {
+      activatePackage(this.pkg).then(
+        () => {
+          successSnack(
+            (this.pkg.title || this.pkg.directoryName) + ' activated'
+          );
+          this.$emit('activated', this.pkg);
+        },
+        (err) => {
+          errorSnack('Failed to activate package', err);
+        }
       );
     },
     selected(val: boolean) {

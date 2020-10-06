@@ -1,3 +1,4 @@
+import Splash from '../views/Splash.vue';
 import Setup from '../views/Setup.vue';
 import Packages from '../views/Packages.vue';
 import Import from '../views/Import.vue';
@@ -5,8 +6,15 @@ import VueRouter, { RouteConfig } from 'vue-router';
 
 const routes: RouteConfig[] = [
   {
+    path: '/',
+    name: 'Splash',
+    component: Splash,
+    meta: {
+      showNav: false
+    }
+  },
+  {
     path: '/setup',
-    alias: '/',
     name: 'Setup',
     component: Setup
   },

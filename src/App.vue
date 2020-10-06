@@ -1,6 +1,11 @@
 <template>
   <v-app>
-    <v-navigation-drawer mini-variant mini-variant-width="64" permanent>
+    <v-navigation-drawer
+      mini-variant
+      mini-variant-width="64"
+      permanent
+      v-if="showNav"
+    >
       <v-list dense nav class="py-0">
         <v-list-item link to="/packages" :exact="false"
           ><v-icon x-large>mdi-package-variant-closed</v-icon></v-list-item
@@ -51,6 +56,11 @@ import Vue from 'vue';
 import Snack from '@/components/snack.vue';
 export default Vue.extend({
   name: 'App',
-  components: { Snack }
+  components: { Snack },
+  computed: {
+    showNav(): boolean {
+      return !this.$route.meta || this.$route.meta.showNav !== false;
+    }
+  }
 });
 </script>
