@@ -2,7 +2,9 @@
 import { app, protocol, BrowserWindow, Menu, ipcMain } from 'electron';
 import path from 'path';
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
+import log from './server/log';
 import './server/ipcServer';
+
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -15,8 +17,7 @@ protocol.registerSchemesAsPrivileged([
 ]);
 
 function createWindow() {
-  // Create the browser window.
-  win = new BrowserWindow({
+  const browserConfig = {
     width: 1024,
     height: 768,
     webPreferences: {
@@ -24,10 +25,13 @@ function createWindow() {
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
       // nodeIntegration: (process.env
       //   .ELECTRON_NODE_INTEGRATION as unknown) as boolean
-      nodeIntegration: true,
+      nodeIntegration: false,
       preload: path.join(__dirname, 'preload.js')
     }
-  });
+  };
+  log.debug('electron browserConfig', browserConfig);
+  // Create the browser window.
+  win = new BrowserWindow(browserConfig);
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode

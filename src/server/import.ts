@@ -12,6 +12,7 @@ import {
 } from '@/types/packageInfo';
 import { unarchive } from './archive';
 import { parsePackageInfo } from '@/data/packageInfo';
+import log from './log';
 
 let tmpDir: tmp.DirResult | undefined;
 
@@ -76,7 +77,7 @@ export async function parseImportFile(
   tmpDir = tmp.dirSync();
   const tmpName = tmpDir.name;
   await unarchive(archivePath, tmpName, onProgress);
-  // console.log('extracted files', files);
+  // log.debug('extracted files', files);
   const manifests = await findManifests(tmpName);
   return { importPath: tmpName, packages: manifests };
 }
@@ -85,7 +86,7 @@ async function installPackage(pkg: ImportPackageInfo) {
   const fromPath = pkg[0];
   const toPath = path.join(getPackagePath('community'), pkg[1].directoryName);
   if (existsSync(toPath)) {
-    console.log('install: toPath exists, removing...', toPath);
+    log.debug('install: toPath exists, removing...', toPath);
     await fs.rmdir(toPath, { recursive: true });
   }
   return new Promise((resolve, reject) => {
@@ -93,7 +94,7 @@ async function installPackage(pkg: ImportPackageInfo) {
       if (err) {
         reject(err);
       } else {
-        console.log('install copy comand complete', fromPath, toPath);
+        log.debug('install copy comand complete', fromPath, toPath);
         resolve();
       }
     });

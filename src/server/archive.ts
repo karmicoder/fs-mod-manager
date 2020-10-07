@@ -1,6 +1,7 @@
 import Seven from 'node-7z';
 import { app } from 'electron';
 import path from 'path';
+import log from './log';
 
 const pathTo7zip =
   process.env.NODE_ENV !== 'production'
@@ -9,7 +10,7 @@ const pathTo7zip =
         '..\\node_modules\\win-7zip\\7zip-lite\\7z.exe'
       )
     : '7z.exe';
-console.log('7zip path: ' + pathTo7zip);
+log.info('7zip path: ' + pathTo7zip);
 
 export function archive(
   fromPath: string,
@@ -17,7 +18,7 @@ export function archive(
   onProgress?: (percent: number) => void
 ): Promise<void> {
   return new Promise((resolve, reject) => {
-    console.log('archive ', { fromPath, toPath });
+    log.debug('archive ', { fromPath, toPath });
     const stream = Seven.add(toPath, fromPath, {
       $bin: pathTo7zip,
       $progress: true,
@@ -38,7 +39,7 @@ export function unarchive(
   onProgress?: (percent: number) => void
 ): Promise<void> {
   return new Promise((resolve, reject) => {
-    console.log('unarchive', { fromPath, toPath });
+    log.debug('unarchive', { fromPath, toPath });
     const stream = Seven.extractFull(fromPath, toPath, {
       $bin: pathTo7zip,
       $progress: true

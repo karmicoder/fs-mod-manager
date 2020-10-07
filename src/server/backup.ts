@@ -4,9 +4,10 @@ import { app } from 'electron';
 import { getPackagePath } from './packages';
 import { PackageInfo } from '@/types/packageInfo';
 import { archive } from './archive';
+import log from './log';
 
-console.log('PROCESS ENV', process.env.LOCALAPPDATA, app.name);
 const localDataPath = path.join(process.env.LOCALAPPDATA as string, app.name);
+log.info('localDataPath: ' + localDataPath);
 
 const backupPath = path.join(localDataPath, 'backup');
 async function initBackupPath() {
@@ -32,6 +33,6 @@ export async function backupPackage(pkg: PackageInfo) {
   return archive(
     origPath,
     path.join(pkgBackupPath, pkg.version + '.7z'),
-    (percent) => console.log('backing up ' + origPath + 'progress ', percent)
+    (percent) => log.debug('backing up ' + origPath + 'progress ', percent)
   );
 }

@@ -1,2 +1,5 @@
 import { ipcRenderer } from 'electron';
-window.ipcRenderer = ipcRenderer;
+process.on('loaded', () => {
+  console.log('process loaded: preload ipcRenderer');
+  window.ipcRenderer = ipcRenderer;
+});
