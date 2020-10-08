@@ -1,3 +1,4 @@
+import { app } from 'electron';
 import path from 'path';
 import { format, transports, createLogger } from 'winston';
 import { localDataPath } from './localData';
@@ -14,4 +15,9 @@ const log = createLogger({
     })
   ]
 });
+log.info(
+  `application start v${app.getVersion()} debug=${process.env.NODE_ENV !==
+    'production'}`
+);
+
 export default log;

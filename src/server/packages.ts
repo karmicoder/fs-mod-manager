@@ -2,9 +2,11 @@ import { PackageLocation } from '@/types/packageInfo';
 import { existsSync, promises as fs } from 'fs';
 import ncp from 'ncp';
 import * as path from 'path';
+import log from './log';
 
 import { inactivePath, localDataPath } from './localData';
 import { parseUpdaters } from './updater';
+import { loggers } from 'winston';
 
 const possibleInstallPaths = [
   process.env.LOCALAPPDATA +
@@ -52,6 +54,7 @@ export function findMsfsInstallPath(): Promise<string> {
 }
 
 export async function verifySetup(): Promise<boolean> {
+  log.debug('verifying setup');
   const installPath = await findMsfsInstallPath();
   await parseUpdaters();
   return existsSync(installPath);
@@ -79,10 +82,15 @@ export async function findPackages(location: PackageLocation) {
     })
   );
 
+  log.info(
+    'findPackages: ' + location + ': ' + manifests.length + ' manifest(s) found'
+  );
+
   return manifests;
 }
 
 export async function deactivatePackage(pkgDirectory: string): Promise<void> {
+  log.info('deactivatePackage ' + pkgDirectory);
   const fromDir = path.join(getPackagePath('community'), pkgDirectory);
   const toDir = path.join(localDataPath, inactivePath, pkgDirectory);
   if (existsSync(toDir)) {
@@ -105,6 +113,7 @@ export async function deactivatePackage(pkgDirectory: string): Promise<void> {
 }
 
 export async function activatePackage(pkgDirectory: string) {
+  log.info('activatePackage ' + pkgDirectory);
   const fromDir = path.join(localDataPath, inactivePath, pkgDirectory);
   const toDir = path.join(getPackagePath('community'), pkgDirectory);
   if (existsSync(toDir)) {

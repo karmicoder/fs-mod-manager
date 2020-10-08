@@ -12,7 +12,6 @@ const updaterFilePath = path.join(localDataPath, 'updater.json');
 let updaterMap: UpdaterMap | undefined = undefined;
 
 export async function parseUpdaters(): Promise<UpdaterMap> {
-  log.info('parseUpdaters, updaterFilePath: ' + updaterFilePath);
   if (!existsSync(updaterFilePath)) {
     await fs.writeFile(updaterFilePath, '{}');
     updaterMap = {};
@@ -21,11 +20,13 @@ export async function parseUpdaters(): Promise<UpdaterMap> {
 
   const rawJson = await fs.readFile(updaterFilePath, 'utf-8');
   updaterMap = JSON.parse(rawJson) as UpdaterMap;
-  Object.keys(updaterMap).forEach((k) => {
+  const updaterKeys = Object.keys(updaterMap);
+  updaterKeys.forEach((k) => {
     if (updaterMap) {
       updaterMap[k].packageDir = k;
     }
   });
+  log.info('parseUpdaters, ' + updaterKeys.length + ' definition(s) found');
   return updaterMap;
 }
 
