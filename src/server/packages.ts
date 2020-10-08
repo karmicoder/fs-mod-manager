@@ -4,6 +4,7 @@ import ncp from 'ncp';
 import * as path from 'path';
 
 import { inactivePath, localDataPath } from './localData';
+import { parseUpdaters } from './updater';
 
 const possibleInstallPaths = [
   process.env.LOCALAPPDATA +
@@ -52,6 +53,7 @@ export function findMsfsInstallPath(): Promise<string> {
 
 export async function verifySetup(): Promise<boolean> {
   const installPath = await findMsfsInstallPath();
+  await parseUpdaters();
   return existsSync(installPath);
 }
 

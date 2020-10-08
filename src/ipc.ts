@@ -5,6 +5,7 @@ import {
   PackageInfo,
   PackageLocation
 } from './types/packageInfo';
+import { AvailableUpdate, UpdaterMap } from './types/updater';
 
 declare global {
   interface Window {
@@ -47,4 +48,14 @@ export function deactivatePackage(pkg: PackageInfo) {
 
 export function activatePackage(pkg: PackageInfo) {
   return window.ipcRenderer.invoke('activatePackage', pkg.directoryName);
+}
+
+export function getUpdaters(): Promise<UpdaterMap | undefined> {
+  return window.ipcRenderer.invoke('getUpdaters');
+}
+
+export function checkForPackageUpdates(
+  pkg: PackageInfo
+): Promise<AvailableUpdate | undefined> {
+  return window.ipcRenderer.invoke('checkForPackageUpdates', pkg);
 }

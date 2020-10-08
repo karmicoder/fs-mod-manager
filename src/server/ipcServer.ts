@@ -14,6 +14,7 @@ import {
   activatePackage,
   verifySetup
 } from './packages';
+import { checkForPackageUpdates, getUpdaters } from './updater';
 
 ipcMain.handle('findMsfsInstallPath', findMsfsInstallPath);
 ipcMain.handle('verifySetup', verifySetup);
@@ -36,4 +37,8 @@ ipcMain.handle('parseImportFile', (ev, archivePath: string) =>
 );
 ipcMain.handle('importPackages', (ev, pkgs: ImportPackageInfo[]) =>
   importPackages(pkgs)
+);
+ipcMain.handle('getUpdaters', () => getUpdaters());
+ipcMain.handle('checkForPackageUpdates', (ev, pkg: PackageInfo) =>
+  checkForPackageUpdates(pkg)
 );

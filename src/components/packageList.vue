@@ -7,16 +7,30 @@
       @deactivated="deactivated"
       @activated="activated"
       :selectable="selectable"
+      :updater="updaters ? updaters[pkg.directoryName] : undefined"
     />
   </div>
 </template>
 <script lang="ts">
+import { getUpdaters } from '@/ipc';
 import { PackageInfo } from '@/types/packageInfo';
+import { UpdaterMap } from '@/types/updater';
 import Vue from 'vue';
 import PackageListItem from './packageListItem.vue';
 export default Vue.extend({
   components: { PackageListItem },
   name: 'PackageList',
+  data() {
+    return {
+      updaters: {} as UpdaterMap
+    };
+  },
+  created() {
+    getUpdaters().then((updateMap) => {
+      console.log('getUpdaters result', updateMap);
+      this.updaters = updateMap || {};
+    });
+  },
   props: {
     packages: {
       type: Array as () => PackageInfo[]
