@@ -3,7 +3,7 @@ import {
   PackageInfo,
   PackageLocation
 } from '@/types/packageInfo';
-import { ipcMain } from 'electron';
+import { app, ipcMain } from 'electron';
 
 import { backupPackage } from './backup';
 import { importPackages, parseImportFile, selectImportFile } from './import';

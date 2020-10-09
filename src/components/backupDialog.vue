@@ -12,14 +12,6 @@
       >
         <v-icon>mdi-folder-upload</v-icon>
       </v-btn>
-      <v-snackbar v-model="saved" timeout="6000" color="success">
-        {{ pkg.title || pkg.directoryName }} backed up
-        <template v-slot:action="{ attrs }">
-          <v-btn dark text v-bind="attrs" @click="snackbar = false">
-            Close
-          </v-btn>
-        </template>
-      </v-snackbar>
     </template>
     <v-card>
       <v-card-title class="headline grey lighten-2">

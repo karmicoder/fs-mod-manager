@@ -37,6 +37,7 @@
 
       <v-card-actions>
         <v-spacer />
+        <UpdateDialog :pkg="pkg" :updater="updater" />
         <BackupDialog :pkg="pkg"></BackupDialog>
         <v-btn
           v-if="pkg.location === 'community'"
@@ -55,14 +56,6 @@
         >
           <v-icon>mdi-clipboard-arrow-left</v-icon>
         </v-btn>
-        <v-btn
-          v-if="updater"
-          icon
-          title="Check for Updates"
-          @click="checkForUpdates"
-        >
-          <v-icon>mdi-clipboard-arrow-up</v-icon>
-        </v-btn>
       </v-card-actions>
     </v-container>
   </v-card>
@@ -71,20 +64,18 @@
 import { unmetDependencies } from '@/data/packageInfo';
 import bytes from 'bytes';
 import BackupDialog from '@/components/backupDialog.vue';
+import UpdateDialog from '@/components/updateDialog.vue';
 import Vue from 'vue';
 import { PackageInfo, UnmetPackageDependency } from '@/types/packageInfo';
-import {
-  activatePackage,
-  deactivatePackage,
-  checkForPackageUpdates
-} from '@/ipc';
+import { activatePackage, deactivatePackage } from '@/ipc';
 import { errorSnack, successSnack } from './snack.vue';
 import { UpdaterDef } from '@/types/updater';
 
 export default Vue.extend({
   name: 'PackageListItem',
   components: {
-    BackupDialog
+    BackupDialog,
+    UpdateDialog
   },
   props: {
     pkg: {
@@ -103,6 +94,7 @@ export default Vue.extend({
       type: Object as () => UpdaterDef
     }
   },
+
   methods: {
     bytes,
     deactivate() {
@@ -133,16 +125,6 @@ export default Vue.extend({
     },
     selected(val: boolean) {
       this.$emit('selected', val);
-    },
-    checkForUpdates() {
-      checkForPackageUpdates(this.pkg).then(
-        (au) => {
-          console.log('Available update', au);
-        },
-        (err) => {
-          errorSnack('Encountered a problem checking for updates', err);
-        }
-      );
     }
   },
   computed: {

@@ -7,8 +7,6 @@ import './server/ipcServer';
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
-log.info(`application start v${app.getVersion()} debug=${isDevelopment}`);
-
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win: BrowserWindow | null;
@@ -30,7 +28,7 @@ function createWindow() {
   log.debug('electron browserConfig', browserConfig);
   // Create the browser window.
   win = new BrowserWindow(browserConfig);
-
+  win.removeMenu();
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
     win.loadURL(process.env.WEBPACK_DEV_SERVER_URL as string);
@@ -40,6 +38,13 @@ function createWindow() {
     // Load the index.html when not in development
     win.loadURL('app://./index.html');
   }
+  ipcMain.handle('devtools', () => {
+    if (win && win.webContents.isDevToolsOpened()) {
+      win.webContents.closeDevTools();
+    } else if (win) {
+      win.webContents.openDevTools();
+    }
+  });
 
   win.on('closed', () => {
     win = null;

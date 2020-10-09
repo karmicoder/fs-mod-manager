@@ -27,8 +27,8 @@ function parseCommit(rawCommit: { [key: string]: any }): GithubCommit {
   return {
     sha: rawCommit.sha,
     message: rawCommit.commit.message,
-    author: rawCommit.author.name,
-    date: moment(rawCommit.author.date).unix()
+    author: rawCommit.author ? rawCommit.author.name : undefined,
+    date: moment(rawCommit.commit.date).unix()
   };
 }
 
