@@ -36,7 +36,7 @@
   </v-dialog>
 </template>
 <script lang="ts">
-import { backupPackage } from '@/ipc';
+import { backupPackage } from '@/ipcRenderer';
 import { PackageInfo } from '@/types/packageInfo';
 import bytes from 'bytes';
 import Vue from 'vue';

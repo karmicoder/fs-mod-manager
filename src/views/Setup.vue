@@ -14,7 +14,7 @@
 </template>
 <script lang="ts">
 import Vue from 'vue';
-import { findMsfsInstallPath } from '@/ipc';
+import { findMsfsInstallPath } from '@/ipcRenderer';
 
 // ipcRenderer.
 export default Vue.extend({

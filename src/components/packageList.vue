@@ -12,7 +12,7 @@
   </div>
 </template>
 <script lang="ts">
-import { getUpdaters } from '@/ipc';
+import { getUpdaters } from '@/ipcRenderer';
 import { PackageInfo } from '@/types/packageInfo';
 import { UpdaterMap } from '@/types/updater';
 import Vue from 'vue';

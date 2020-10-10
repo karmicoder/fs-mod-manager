@@ -1,5 +1,5 @@
 import path from 'path';
-import { existsSync } from 'fs';
+import { exists, existsSync } from 'fs';
 import { promises as fs } from 'fs';
 import { app } from 'electron';
 export const localDataPath = path.join(

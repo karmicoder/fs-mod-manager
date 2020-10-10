@@ -1,16 +1,31 @@
-import { AvailableUpdate, UpdaterDef, UpdaterMap } from '@/types/updater';
+import {
+  AvailableUpdate,
+  UpdatePackageResult,
+  UpdaterDef,
+  UpdaterMap
+} from '@/types/updater';
 import { existsSync } from 'fs';
 import path from 'path';
 import { localDataPath } from './localData';
 import { promises as fs } from 'fs';
 import log from './log';
 import { PackageInfo } from '@/types/packageInfo';
-import { checkForGithubUpdates } from './updaters/github';
+import { checkForGithubUpdates, updateGithubPackage } from './updaters/github';
 import { GithubUpdaterDef } from '@/types/github';
 
 const updaterFilePath = path.join(localDataPath, 'updater.json');
 let updaterMap: UpdaterMap | undefined = undefined;
 
+export async function updateComplete(
+  result: UpdatePackageResult
+): Promise<UpdatePackageResult> {
+  if (updaterMap) {
+    log.debug('updateComplete: writing to ' + updaterFilePath);
+    updaterMap[result.updater.packageDir] = result.updater;
+    await fs.writeFile(updaterFilePath, JSON.stringify(updaterMap), 'utf-8');
+  }
+  return result;
+}
 export async function parseUpdaters(): Promise<UpdaterMap> {
   if (!existsSync(updaterFilePath)) {
     await fs.writeFile(updaterFilePath, '{}');
@@ -47,6 +62,19 @@ export async function checkForPackageUpdates(
   } else {
     return undefined;
   }
+}
+
+export async function updatePackage(
+  pkg: PackageInfo,
+  updater: UpdaterDef
+): Promise<UpdatePackageResult> {
+  if (updater.type === 'github') {
+    return updateGithubPackage(pkg, updater as GithubUpdaterDef).then(
+      updateComplete
+    );
+  }
+
+  throw new Error('Unknown package type: ' + updater.type);
 }
 
 async function checkUpdater(

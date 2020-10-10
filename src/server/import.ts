@@ -11,8 +11,8 @@ import {
   PackageInfo
 } from '@/types/packageInfo';
 import { unarchive } from './archive';
-import { parsePackageInfo } from '@/data/packageInfo';
 import log from './log';
+import { parsePackageInfo } from '@/data/parsePackageInfo';
 
 let tmpDir: tmp.DirResult | undefined;
 
@@ -71,18 +71,19 @@ export async function findManifests(
 
 export async function parseImportFile(
   archivePath: string,
-  onProgress: (percent: number) => void
+  onProgress?: (percent: number) => void
 ): Promise<ImportInfo> {
   cleanupTmpDir();
   tmpDir = tmp.dirSync();
   const tmpName = tmpDir.name;
+  log.debug('parseImportFile: extracting ' + archivePath + ' to ' + tmpName);
   await unarchive(archivePath, tmpName, onProgress);
-  // log.debug('extracted files', files);
   const manifests = await findManifests(tmpName);
+  log.debug('parseImportFile: found ' + manifests.length + ' manifests');
   return { importPath: tmpName, packages: manifests };
 }
 
-async function installPackage(pkg: ImportPackageInfo) {
+export async function installPackage(pkg: ImportPackageInfo) {
   const fromPath = pkg[0];
   const toPath = path.join(getPackagePath('community'), pkg[1].directoryName);
   if (existsSync(toPath)) {
@@ -90,6 +91,7 @@ async function installPackage(pkg: ImportPackageInfo) {
     await fs.rmdir(toPath, { recursive: true });
   }
   return new Promise((resolve, reject) => {
+    log.debug('installPackage: copying');
     ncp(fromPath, toPath, { stopOnErr: true }, (err) => {
       if (err) {
         reject(err);

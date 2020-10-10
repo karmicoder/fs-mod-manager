@@ -3,7 +3,7 @@
 </template>
 <script lang="ts">
 import { errorSnack } from '@/components/snack.vue';
-import { verifySetup } from '@/ipc';
+import { verifySetup } from '@/ipcRenderer';
 import Vue from 'vue';
 export default Vue.extend({
   name: 'Splash',

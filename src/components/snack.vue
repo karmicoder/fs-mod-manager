@@ -16,6 +16,7 @@
 </template>
 <script lang="ts">
 import Vue from 'vue';
+
 export interface SnackRequest {
   color?: string;
   text: string;

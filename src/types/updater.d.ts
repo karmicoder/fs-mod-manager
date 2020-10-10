@@ -16,3 +16,7 @@ export interface AvailableUpdate {
   changes?: string[];
   date?: number;
 }
+export interface UpdatePackageResult {
+  pkg: PackageInfo;
+  updater: UpdaterDef;
+}

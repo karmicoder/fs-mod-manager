@@ -67,7 +67,7 @@ import BackupDialog from '@/components/backupDialog.vue';
 import UpdateDialog from '@/components/updateDialog.vue';
 import Vue from 'vue';
 import { PackageInfo, UnmetPackageDependency } from '@/types/packageInfo';
-import { activatePackage, deactivatePackage } from '@/ipc';
+import { activatePackage, deactivatePackage } from '@/ipcRenderer';
 import { errorSnack, successSnack } from './snack.vue';
 import { UpdaterDef } from '@/types/updater';
 
@@ -105,7 +105,7 @@ export default Vue.extend({
           );
           this.$emit('deactivated', this.pkg);
         },
-        (err) => {
+        (err: Error) => {
           errorSnack('Failed to deactivate package', err);
         }
       );
@@ -118,7 +118,7 @@ export default Vue.extend({
           );
           this.$emit('activated', this.pkg);
         },
-        (err) => {
+        (err: Error) => {
           errorSnack('Failed to activate package', err);
         }
       );

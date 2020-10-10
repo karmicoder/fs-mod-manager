@@ -18,9 +18,3 @@ declare module 'vue/types/vue' {
     };
   }
 }
-
-declare module global {
-  export interface WindowEventMap {
-    snack: SnackEvent;
-  }
-}

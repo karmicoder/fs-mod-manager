@@ -3,6 +3,7 @@ import {
   PackageInfo,
   PackageLocation
 } from '@/types/packageInfo';
+import { UpdatePackageResult, UpdaterDef } from '@/types/updater';
 import { app, ipcMain } from 'electron';
 
 import { backupPackage } from './backup';
@@ -14,7 +15,7 @@ import {
   activatePackage,
   verifySetup
 } from './packages';
-import { checkForPackageUpdates, getUpdaters } from './updater';
+import { checkForPackageUpdates, getUpdaters, updatePackage } from './updater';
 
 ipcMain.handle('findMsfsInstallPath', findMsfsInstallPath);
 ipcMain.handle('verifySetup', verifySetup);
@@ -41,4 +42,10 @@ ipcMain.handle('importPackages', (ev, pkgs: ImportPackageInfo[]) =>
 ipcMain.handle('getUpdaters', () => getUpdaters());
 ipcMain.handle('checkForPackageUpdates', (ev, pkg: PackageInfo) =>
   checkForPackageUpdates(pkg)
+);
+ipcMain.handle(
+  'updatePackage',
+  (ev, pkg: PackageInfo, updater: UpdaterDef): Promise<UpdatePackageResult> => {
+    return updatePackage(pkg, updater);
+  }
 );

@@ -52,12 +52,15 @@
 </template>
 <script lang="ts">
 import { clearPackageInfo } from '@/data/packageInfo';
-import { selectImportFile, parseImportFile, importPackages } from '@/ipc';
+import ipcRenderer, {
+  selectImportFile,
+  parseImportFile,
+  importPackages
+} from '@/ipcRenderer';
 import Vue from 'vue';
 import PackageList from '@/components/packageList.vue';
 import { ImportInfo, PackageInfo } from '@/types/packageInfo';
 import { errorSnack, successSnack } from '@/components/snack.vue';
-// import { ipcRenderer } from 'electron';
 
 export default Vue.extend({
   name: 'Import',
@@ -66,7 +69,7 @@ export default Vue.extend({
   },
   created() {
     console.log('import created');
-    window.ipcRenderer.on('unarchive_progress', (ev, percent: number) => {
+    ipcRenderer.on('unarchive_progress', (ev: unknown, percent: number) => {
       console.log('unarchive_progress', percent);
       this.unarchiveProgress = percent;
     });

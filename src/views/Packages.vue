@@ -52,6 +52,7 @@ import { getPackages, packageNameComparator } from '@/data/packageInfo';
 import { PackageInfo, PackageLocation } from '@/types/packageInfo';
 
 const tabValues: PackageLocation[] = ['community', 'official', 'inactive'];
+
 // ipcRenderer.
 export default Vue.extend({
   components: {

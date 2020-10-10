@@ -54,9 +54,18 @@
 <script lang="ts">
 import Vue from 'vue';
 import Snack from '@/components/snack.vue';
+import ipcRenderer from './ipcRenderer';
 export default Vue.extend({
   name: 'App',
   components: { Snack },
+  created() {
+    document.addEventListener('keyup', (ev) => {
+      console.log('keyup', ev.key);
+      if (ev.key === 'F12') {
+        ipcRenderer.emit('devtools');
+      }
+    });
+  },
   computed: {
     showNav(): boolean {
       return !this.$route.meta || this.$route.meta.showNav !== false;
