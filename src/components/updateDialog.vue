@@ -3,6 +3,7 @@
     icon
     color="primary"
     :title="buttonTooltip"
+    :loading="isChecking"
     v-if="updater"
     @click.stop="checkForUpdates"
   >
@@ -16,6 +17,11 @@
           >{{ pkg.title || pkg.directoryName }} {{ pkg.version }} ➔
           {{ availableUpdate.version }}
         </v-card-text>
+        <v-card-text v-if="availableUpdate">
+          <p v-for="(line, index) in availableUpdate.changes" :key="index">
+            {{ line }}
+          </p></v-card-text
+        >
         <v-card-actions>
           <v-btn color="primary" @click="installUpdate">
             Install Update
@@ -35,7 +41,10 @@
   </v-btn>
 </template>
 <script lang="ts">
-import { checkForPackageUpdates, updatePackage } from '@/ipcRenderer';
+import ipcRenderer, {
+  checkForPackageUpdates,
+  updatePackage
+} from '@/ipcRenderer';
 import { PackageInfo } from '@/types/packageInfo';
 import { AvailableUpdate, UpdateProgress, UpdaterDef } from '@/types/updater';
 import Vue from 'vue';
@@ -61,6 +70,13 @@ export default Vue.extend({
       isUpToDate: false,
       progress: undefined as UpdateProgress | undefined
     };
+  },
+  created() {
+    ipcRenderer.on('update-progress', this.handleProgress);
+  },
+  // eslint-disable-next-line vue/no-deprecated-destroyed-lifecycle
+  beforeDestroy() {
+    ipcRenderer.off('update-progress', this.handleProgress);
   },
   methods: {
     checkForUpdates() {
@@ -95,6 +111,7 @@ export default Vue.extend({
         (result) => {
           this.dialog = false;
           this.updating = false;
+          this.isUpToDate = true;
           successSnack(
             (result.pkg.title || result.pkg.directoryName) +
               ' updated to version ' +
@@ -122,8 +139,6 @@ export default Vue.extend({
         return 'mdi-clock-check';
       } else if (this.availableUpdate) {
         return 'mdi-clock-alert';
-      } else if (this.isChecking) {
-        return 'mdi-update';
       }
       return 'mdi-clock';
     },

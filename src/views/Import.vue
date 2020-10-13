@@ -10,7 +10,7 @@
       <v-stepper-step step="4">Install Packages</v-stepper-step>
     </v-stepper-header>
     <v-stepper-items>
-      <v-stepper-content step="1">
+      <v-stepper-content step="1" class="elevation-1">
         <h1 class="text-center">Import File</h1>
         <div>
           Select a zip file that contains one or more packages to import
