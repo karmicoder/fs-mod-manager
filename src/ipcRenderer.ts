@@ -1,4 +1,4 @@
-import { IpcRenderer } from 'electron';
+import { IpcRenderer, IpcRendererEvent } from 'electron';
 import {
   ImportInfo,
   ImportPackageInfo,
@@ -8,6 +8,7 @@ import {
 import {
   AvailableUpdate,
   UpdatePackageResult,
+  UpdateProgress,
   UpdaterDef,
   UpdaterMap
 } from './types/updater';
@@ -63,7 +64,18 @@ export function checkForPackageUpdates(
 
 export function updatePackage(
   pkg: PackageInfo,
-  def: UpdaterDef
+  def: UpdaterDef,
+  availableUpdate: AvailableUpdate,
+  progressHandler?: (ev: IpcRendererEvent, progress: UpdateProgress) => void
 ): Promise<UpdatePackageResult> {
-  return ipcRenderer.invoke('updatePackage', pkg, def);
+  if (progressHandler) {
+    ipcRenderer.on('update-progress', progressHandler);
+  }
+  return ipcRenderer
+    .invoke('updatePackage', pkg, def, availableUpdate)
+    .finally(() => {
+      if (progressHandler) {
+        ipcRenderer.off('update-progress', progressHandler);
+      }
+    });
 }

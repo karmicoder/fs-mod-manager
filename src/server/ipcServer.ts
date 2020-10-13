@@ -3,11 +3,17 @@ import {
   PackageInfo,
   PackageLocation
 } from '@/types/packageInfo';
-import { UpdatePackageResult, UpdaterDef } from '@/types/updater';
-import { app, ipcMain } from 'electron';
+import {
+  AvailableUpdate,
+  UpdatePackageResult,
+  UpdateProgress,
+  UpdaterDef
+} from '@/types/updater';
+import { app, ipcMain, IpcMainEvent, BrowserWindow } from 'electron';
 
 import { backupPackage } from './backup';
 import { importPackages, parseImportFile, selectImportFile } from './import';
+import log from './log';
 import {
   findMsfsInstallPath,
   findPackages,
@@ -16,7 +22,15 @@ import {
   verifySetup
 } from './packages';
 import { checkForPackageUpdates, getUpdaters, updatePackage } from './updater';
-
+ipcMain.on('devtools', () => {
+  log.debug('toggle devtools');
+  const win = BrowserWindow.getFocusedWindow();
+  if (win && win.webContents.isDevToolsOpened()) {
+    win.webContents.closeDevTools();
+  } else if (win) {
+    win.webContents.openDevTools();
+  }
+});
 ipcMain.handle('findMsfsInstallPath', findMsfsInstallPath);
 ipcMain.handle('verifySetup', verifySetup);
 ipcMain.handle('findPackages', (ev, location: PackageLocation) =>
@@ -45,7 +59,18 @@ ipcMain.handle('checkForPackageUpdates', (ev, pkg: PackageInfo) =>
 );
 ipcMain.handle(
   'updatePackage',
-  (ev, pkg: PackageInfo, updater: UpdaterDef): Promise<UpdatePackageResult> => {
-    return updatePackage(pkg, updater);
+  (
+    ev,
+    pkg: PackageInfo,
+    updater: UpdaterDef,
+    availableUpdate: AvailableUpdate
+  ): Promise<UpdatePackageResult> => {
+    const progressHandler = (ev: IpcMainEvent, progress: UpdateProgress) => {
+      ev.sender.send('update-progress', progress);
+    };
+    ipcMain.on('update-progress', progressHandler);
+    return updatePackage(pkg, updater, availableUpdate).finally(() =>
+      ipcMain.off('update-progress', progressHandler)
+    );
   }
 );

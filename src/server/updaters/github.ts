@@ -1,5 +1,9 @@
-import { GithubCommit, GithubUpdaterDef } from '@/types/github';
-import { AvailableUpdate, UpdatePackageResult } from '@/types/updater';
+import { GithubCommit, GithubRelease, GithubUpdaterDef } from '@/types/github';
+import {
+  AvailableUpdate,
+  UpdatePackageResult,
+  UpdateProgress
+} from '@/types/updater';
 import fs from 'fs';
 import axios from 'axios';
 import tmp from 'tmp';
@@ -7,7 +11,10 @@ import moment from 'moment';
 import log from '@/server/log';
 import { PackageInfo } from '@/types/packageInfo';
 import { installPackage, parseImportFile } from '../import';
+import compareVersions from 'compare-versions';
+import { webContents } from 'electron';
 import bytes from 'bytes';
+
 const githubApi = axios.create({
   baseURL: 'https://api.github.com/',
   headers: {
@@ -37,9 +44,24 @@ function parseCommit(rawCommit: { [key: string]: any }): GithubCommit {
   };
 }
 
+function parseRelease(rawRelease: { [key: string]: any }): GithubRelease {
+  return {
+    id: rawRelease.indexOf,
+    tagName: rawRelease.tag_name,
+    prerelease: rawRelease.prerelease,
+    date: moment(rawRelease.published_at || rawRelease.created_at).unix(),
+    body: rawRelease.body,
+    downloadUrl: rawRelease.assets[0]
+      ? rawRelease.assets[0].browser_download_url
+      : undefined,
+    size: rawRelease.assets[0] ? rawRelease.assets[0].size : undefined
+  };
+}
+
 async function downloadPackage(
-  project: string,
-  branchOrTag: string
+  url: string,
+  packageDir: string,
+  expectedSize?: number
 ): Promise<tmp.FileResult> {
   const tmpFile = tmp.fileSync({ postfix: '.zip' });
   const stream = fs.createWriteStream(tmpFile.name, {
@@ -47,21 +69,30 @@ async function downloadPackage(
     autoClose: true,
     fd: tmpFile.fd
   });
-  const url =
-    'https://github.com/' + project + '/archive/' + branchOrTag + '.zip';
   log.info('github: download package: ' + url);
   const resp = await axios.get(url, {
     responseType: 'stream'
   });
   log.debug('github: download headers', resp.headers);
   resp.data.pipe(stream);
-  const fileSize = resp.headers['content-length'];
+  const fileSize = expectedSize || parseInt(resp.headers['content-length']);
   let bytesRx = 0;
   resp.data.on('data', (chunk: []) => {
     bytesRx += chunk.length;
     log.debug(
-      'github download progress ' + bytes(bytesRx) + '/' + bytes(fileSize)
+      'got chunk: downloaded ' + bytes(bytesRx) + '/' + bytes(fileSize)
     );
+    try {
+      webContents.getFocusedWebContents().send('update-progress', {
+        packageDir,
+        operation: 'Downloading',
+        progress: (bytesRx / fileSize) * 100 * 0.2
+      } as UpdateProgress);
+    } catch (ex) {
+      log.error('failed to emit update-progress', ex);
+    }
+
+    return chunk;
   });
 
   return new Promise((resolve, reject) => {
@@ -71,7 +102,6 @@ async function downloadPackage(
       resolve(tmpFile);
     });
     stream.on('error', (err) => {
-      tmpFile.removeCallback();
       reject(err);
     });
   });
@@ -87,6 +117,17 @@ async function getLatestCommits({
   return json.map(parseCommit);
 }
 
+async function getLatestReleases({
+  project,
+  prerelease
+}: GithubUpdaterDef): Promise<GithubRelease[]> {
+  const url = `repos/${project}/releases`;
+  const resp = await githubApi.get(url);
+  const json = resp.data as [];
+  return json
+    .map(parseRelease)
+    .filter((r) => prerelease === true || r.prerelease !== true);
+}
 export async function checkForGithubUpdates(
   def: GithubUpdaterDef
 ): Promise<AvailableUpdate | undefined> {
@@ -99,37 +140,77 @@ export async function checkForGithubUpdates(
         return {
           version: latestCommit.sha,
           changes: commits.map((c) => c.message),
-          date: latestCommit.date
+          date: latestCommit.date,
+          url:
+            'https://github.com/' +
+            def.project +
+            '/archive/' +
+            def.branch +
+            '.zip'
         };
+      }
+    }
+  } else if (def.src === 'release') {
+    const releases = await getLatestReleases(def);
+
+    if (releases.length > 0) {
+      const latestRelease = releases[0];
+
+      let comparedVersions = 0;
+      try {
+        comparedVersions = compareVersions(
+          def.lastVersion,
+          latestRelease.tagName
+        );
+      } catch {}
+      if (
+        !def.lastVersion ||
+        comparedVersions > 0 ||
+        latestRelease.date > def.lastUpdated
+      ) {
+        const result = {
+          version: latestRelease.tagName,
+          changes: latestRelease.body ? latestRelease.body.split('\n') : [],
+          date: latestRelease.date,
+          url: latestRelease.downloadUrl,
+          expectedSize: latestRelease.size
+        };
+        log.debug('update available for ' + def.packageDir, result);
+        return result;
+      } else {
+        log.debug(def.packageDir + ' up to date', { latestRelease, def });
       }
     }
   } else {
     throw new Error('checkForGithubUpdates not implemented for src="release"');
   }
+
+  return undefined;
 }
 
 export async function updateGithubPackage(
   pkg: PackageInfo,
-  updater: GithubUpdaterDef
+  updater: GithubUpdaterDef,
+  availableUpdate: AvailableUpdate
 ): Promise<UpdatePackageResult> {
-  const downloadTmpFile = await downloadPackage(
-    updater.project,
-    updater.branch
+  const downloadTmpFile: tmp.FileResult = await downloadPackage(
+    availableUpdate.url,
+    pkg.directoryName
   );
-  try {
-    const importInfo = await parseImportFile(downloadTmpFile.name);
-    if (importInfo.packages.length <= 0) {
-      throw new Error(
-        'Downloaded archive does not contain any recognized msfs packages'
-      );
-    } else if (importInfo.packages.length > 1) {
-      throw new Error(
-        'Downloaded archive contains multiple packages. Ony one can be auto-updated'
-      );
-    }
-    await installPackage(importInfo.packages[0]);
-    return { pkg: importInfo.packages[0][1], updater };
-  } finally {
-    // downloadTmpFile.removeCallback();
+  const importInfo = await parseImportFile(downloadTmpFile.name);
+  if (importInfo.packages.length <= 0) {
+    throw new Error(
+      'Downloaded archive does not contain any recognized msfs packages'
+    );
+  } else if (importInfo.packages.length > 1) {
+    throw new Error(
+      'Downloaded archive contains multiple packages. Ony one can be auto-updated'
+    );
   }
+  await installPackage(importInfo.packages[0]);
+  downloadTmpFile.removeCallback();
+  updater.lastUpdated = moment().unix();
+  updater.lastVersion = availableUpdate.version;
+
+  return { pkg: importInfo.packages[0][1], updater };
 }

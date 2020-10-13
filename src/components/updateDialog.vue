@@ -1,41 +1,43 @@
 <template>
-  <v-dialog v-model="dialog" width="500" v-if="updater">
-    <template v-slot:activator="{ on, attrs }">
-      <v-btn
-        icon
-        color="primary"
-        title="Check for Updates"
-        v-on="on"
-        v-bind="attrs"
-        @click="checkForUpdates"
-      >
-        <v-icon>{{ updateIcon }}</v-icon>
-      </v-btn>
-    </template>
-    <v-card v-if="!updating">
-      <v-card-title class="headline grey lighten-2"
-        >Update Available</v-card-title
-      >
-      <v-card-text v-if="pkg && availableUpdate"
-        >{{ pkg.title || pkg.directoryName }} {{ pkg.version }} ➔
-        {{ availableUpdate.version }}
-      </v-card-text>
-      <v-card-actions>
-        <v-btn color="primary" @click="installUpdate">
-          Install Update
-        </v-btn>
-      </v-card-actions>
-    </v-card>
-    <v-card v-if="updating">
-      <v-card-text>Installing Update &hellip;</v-card-text>
-      <v-progress-linear indeterminate />
-    </v-card>
-  </v-dialog>
+  <v-btn
+    icon
+    color="primary"
+    :title="buttonTooltip"
+    v-if="updater"
+    @click.stop="checkForUpdates"
+  >
+    <v-icon>{{ updateIcon }}</v-icon>
+    <v-dialog v-model="dialog" width="500">
+      <v-card v-if="!updating">
+        <v-card-title class="headline grey lighten-2"
+          >Update Available</v-card-title
+        >
+        <v-card-text v-if="pkg && availableUpdate"
+          >{{ pkg.title || pkg.directoryName }} {{ pkg.version }} ➔
+          {{ availableUpdate.version }}
+        </v-card-text>
+        <v-card-actions>
+          <v-btn color="primary" @click="installUpdate">
+            Install Update
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+      <v-card v-if="updating">
+        <v-card-title class="headline grey lighten-2"
+          >Installing Update</v-card-title
+        >
+        <v-card-text v-if="progress"
+          >{{ progress.operation }} &hellip;</v-card-text
+        >
+        <v-progress-linear v-model="progressPercent" />
+      </v-card>
+    </v-dialog>
+  </v-btn>
 </template>
 <script lang="ts">
 import { checkForPackageUpdates, updatePackage } from '@/ipcRenderer';
 import { PackageInfo } from '@/types/packageInfo';
-import { AvailableUpdate, UpdaterDef } from '@/types/updater';
+import { AvailableUpdate, UpdateProgress, UpdaterDef } from '@/types/updater';
 import Vue from 'vue';
 import { errorSnack, successSnack } from './snack.vue';
 
@@ -55,24 +57,41 @@ export default Vue.extend({
       dialog: false,
       availableUpdate: undefined as AvailableUpdate | undefined,
       updating: false,
-      isUpToDate: false
+      isChecking: false,
+      isUpToDate: false,
+      progress: undefined as UpdateProgress | undefined
     };
   },
   methods: {
     checkForUpdates() {
-      checkForPackageUpdates(this.pkg).then(
-        (au) => {
-          this.availableUpdate = au;
-          this.isUpToDate = !au;
-        },
-        (err) => {
-          errorSnack('Encountered a problem checking for updates', err);
-        }
-      );
+      this.isChecking = true;
+      this.dialog = false;
+      checkForPackageUpdates(this.pkg)
+        .then(
+          (au) => {
+            this.availableUpdate = au;
+            this.isUpToDate = !au;
+            this.dialog = !!au;
+          },
+          (err) => {
+            errorSnack('Encountered a problem checking for updates', err);
+          }
+        )
+        .finally(() => (this.isChecking = false));
     },
     installUpdate() {
+      if (!this.availableUpdate) {
+        errorSnack('No update is available');
+        return;
+      }
       this.updating = true;
-      updatePackage(this.pkg, this.updater).then(
+
+      updatePackage(
+        this.pkg,
+        this.updater,
+        this.availableUpdate,
+        this.handleProgress
+      ).then(
         (result) => {
           this.dialog = false;
           this.updating = false;
@@ -92,6 +111,9 @@ export default Vue.extend({
           );
         }
       );
+    },
+    handleProgress(ev: unknown, progress: UpdateProgress) {
+      this.progress = progress;
     }
   },
   computed: {
@@ -100,8 +122,23 @@ export default Vue.extend({
         return 'mdi-clock-check';
       } else if (this.availableUpdate) {
         return 'mdi-clock-alert';
+      } else if (this.isChecking) {
+        return 'mdi-update';
       }
       return 'mdi-clock';
+    },
+    buttonTooltip(): string {
+      if (this.isUpToDate) {
+        return 'Package is up to date';
+      } else if (this.availableUpdate) {
+        return 'Update is available';
+      } else if (this.isChecking) {
+        return 'Checking for updates...';
+      }
+      return 'Check for updates';
+    },
+    progressPercent(): number {
+      return this.progress?.progress || 0;
     }
   }
 });

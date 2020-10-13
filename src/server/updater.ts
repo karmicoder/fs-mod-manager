@@ -66,12 +66,15 @@ export async function checkForPackageUpdates(
 
 export async function updatePackage(
   pkg: PackageInfo,
-  updater: UpdaterDef
+  updater: UpdaterDef,
+  availableUpdate: AvailableUpdate
 ): Promise<UpdatePackageResult> {
   if (updater.type === 'github') {
-    return updateGithubPackage(pkg, updater as GithubUpdaterDef).then(
-      updateComplete
-    );
+    return updateGithubPackage(
+      pkg,
+      updater as GithubUpdaterDef,
+      availableUpdate
+    ).then(updateComplete);
   }
 
   throw new Error('Unknown package type: ' + updater.type);

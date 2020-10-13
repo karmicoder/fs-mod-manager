@@ -45,7 +45,7 @@
           icon
           title="Deactivate"
           @click="deactivate"
-          ><v-icon>mdi-clipboard-arrow-right</v-icon>
+          ><v-icon>mdi-folder-move</v-icon>
         </v-btn>
         <v-btn
           v-if="pkg.location === 'inactive'"
@@ -54,7 +54,7 @@
           title="Activate"
           @click="activate"
         >
-          <v-icon>mdi-clipboard-arrow-left</v-icon>
+          <v-icon>mdi-folder-plus</v-icon>
         </v-btn>
       </v-card-actions>
     </v-container>

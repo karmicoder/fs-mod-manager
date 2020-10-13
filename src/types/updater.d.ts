@@ -15,8 +15,16 @@ export interface AvailableUpdate {
   desc?: string;
   changes?: string[];
   date?: number;
+  url: string;
+  expectedSize?: number;
 }
 export interface UpdatePackageResult {
   pkg: PackageInfo;
   updater: UpdaterDef;
+}
+
+export interface UpdateProgress {
+  packageDir: string;
+  operation: string;
+  progress: number; // 0-100
 }

@@ -51,11 +51,11 @@ export function successSnack(text: string) {
   });
 }
 
-export function errorSnack(text: string, err: Error) {
+export function errorSnack(text: string, err?: Error) {
   addSnack({
     color: 'error',
     text,
-    details: err.message + '\n' + err.stack,
+    details: err?.message + '\n' + err?.stack,
     closeable: true,
     timeout: 30000
   });

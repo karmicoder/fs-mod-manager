@@ -60,9 +60,9 @@ export default Vue.extend({
   components: { Snack },
   created() {
     document.addEventListener('keyup', (ev) => {
-      console.log('keyup', ev.key);
       if (ev.key === 'F12') {
-        ipcRenderer.emit('devtools');
+        console.log('toggle devtools');
+        ipcRenderer.send('devtools');
       }
     });
   },
