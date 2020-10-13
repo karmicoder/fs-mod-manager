@@ -1,6 +1,6 @@
 <template>
-  <v-stepper class="import" v-model="step">
-    <v-stepper-header>
+  <v-stepper class="import elevation-0" v-model="step">
+    <v-stepper-header class="elevation-0">
       <v-stepper-step :complete="step > 1" step="1">Select File</v-stepper-step>
       <v-divider />
       <v-stepper-step :complete="step > 2" step="2">Extract</v-stepper-step>
@@ -10,7 +10,7 @@
       <v-stepper-step step="4">Install Packages</v-stepper-step>
     </v-stepper-header>
     <v-stepper-items>
-      <v-stepper-content step="1" class="elevation-1">
+      <v-stepper-content step="1" class="elevation-0">
         <h1 class="text-center">Import File</h1>
         <div>
           Select a zip file that contains one or more packages to import
@@ -20,14 +20,14 @@
         >
         <br />
       </v-stepper-content>
-      <v-stepper-content step="2">
+      <v-stepper-content step="2" class="elevation-0">
         <span v-if="!importInfo"
           >Extracting files {{ this.archivePath }}...
           {{ unarchiveProgress }}</span
         >
         <v-progress-linear v-model="unarchiveProgress" />
       </v-stepper-content>
-      <v-stepper-content step="3" class="step-3">
+      <v-stepper-content step="3" class="step-3 elevation-0">
         <v-container>
           <v-btn color="green white--text" @click="install">
             <v-icon @click="install">mdi-file-import</v-icon> Install
@@ -43,7 +43,7 @@
           }}</pre>
         </v-container>
       </v-stepper-content>
-      <v-stepper-content step="4">
+      <v-stepper-content step="4" class="elevation-0">
         <h1>Installing Packages...</h1>
         <v-progress-linear indeterminate />
       </v-stepper-content>

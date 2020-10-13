@@ -29,6 +29,8 @@ ipcMain.on('devtools', () => {
     win.webContents.closeDevTools();
   } else if (win) {
     win.webContents.openDevTools();
+  } else {
+    log.warn("can't toggle devtools, no window");
   }
 });
 ipcMain.handle('findMsfsInstallPath', findMsfsInstallPath);

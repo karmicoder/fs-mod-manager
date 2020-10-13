@@ -6,19 +6,17 @@
       permanent
       v-if="showNav"
     >
-      <v-list dense nav class="py-0">
-        <v-list-item link to="/packages" :exact="false"
+      <v-list nav class="py-0">
+        <v-list-item link to="/packages" :exact="false" title="Packages"
           ><v-icon x-large>mdi-package-variant-closed</v-icon></v-list-item
         >
-      </v-list>
-      <v-list dense nav class="py-0">
-        <v-list-item link to="/import"
-          ><v-icon x-large>mdi-file-import</v-icon></v-list-item
+
+        <v-list-item link to="/import" title="Import Package"
+          ><v-icon x-large>mdi-import</v-icon></v-list-item
         >
-      </v-list>
-      <v-list dense nav class="py-0">
-        <v-list-item link to="/setup">
-          <v-icon x-large>mdi-wrench</v-icon>
+        <v-spacer />
+        <v-list-item link to="/setup" title="Setup">
+          <v-icon x-large>mdi-cog-outline</v-icon>
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
@@ -40,6 +38,20 @@
     .v-main {
       flex-grow: 1;
       overflow-y: auto;
+    }
+  }
+
+  .v-navigation-drawer {
+    padding: 12px 0;
+    .v-list {
+      height: 100%;
+      overflow: hidden;
+      display: flex;
+      flex-flow: column nowrap;
+      flex-grow: 1;
+      .v-list-item {
+        flex: 0 0;
+      }
     }
   }
 
