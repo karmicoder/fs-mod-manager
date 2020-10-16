@@ -139,9 +139,11 @@ export default Vue.extend({
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
+  margin: 12px auto;
+  width: 80%;
   > .select {
     margin: 0;
-    padding: 0 12px;
+    padding: 0 6px;
     width: 48px;
   }
   > .container {

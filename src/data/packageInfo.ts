@@ -14,15 +14,22 @@ function parsePackages(
   rawObjs: [string, string][],
   location: PackageLocation
 ): PackageInfo[] {
-  return rawObjs.map(([directoryName, rawObjStr]) => {
-    const pkg = parsePackageInfo(directoryName, rawObjStr, location);
-    packageVersions.set(directoryName, pkg.version);
-    // HACK: fix missing fs-base-propdefs
-    if (location === 'official' && directoryName === 'fs-base') {
-      packageVersions.set('fs-base-propdefs', pkg.version);
-    }
-    return pkg;
-  });
+  return rawObjs
+    .map(([directoryName, rawObjStr]): PackageInfo | undefined => {
+      try {
+        const pkg = parsePackageInfo(directoryName, rawObjStr, location);
+        packageVersions.set(directoryName, pkg.version);
+        // HACK: fix missing fs-base-propdefs
+        if (location === 'official' && directoryName === 'fs-base') {
+          packageVersions.set('fs-base-propdefs', pkg.version);
+        }
+        return pkg;
+      } catch (err) {
+        console.error('unparseable manifest ' + directoryName, rawObjStr);
+        return undefined;
+      }
+    })
+    .filter((p) => p !== undefined) as PackageInfo[];
 }
 
 export function packageNameComparator(a: PackageInfo, b: PackageInfo): number {

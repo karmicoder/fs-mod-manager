@@ -1,15 +1,16 @@
 <template>
-  <div class="packages">
-    <PackageListItem
-      v-for="pkg in packages"
-      :key="pkg.directoryName"
-      :pkg="pkg"
-      @deactivated="deactivated"
-      @activated="activated"
-      :selectable="selectable"
-      :updater="updaters ? updaters[pkg.directoryName] : undefined"
-    />
-  </div>
+  <v-virtual-scroll :items="packages" item-height="158" class="packages">
+    <template v-slot="{ item }">
+      <PackageListItem
+        :key="item.directoryName"
+        :pkg="item"
+        @deactivated="deactivated"
+        @activated="activated"
+        :selectable="selectable"
+        :updater="updaters ? updaters[item.directoryName] : undefined"
+      />
+    </template>
+  </v-virtual-scroll>
 </template>
 <script lang="ts">
 import { getUpdaters } from '@/ipcRenderer';

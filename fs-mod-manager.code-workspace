@@ -1,16 +1,25 @@
 {
-	"folders": [
-		{
-			"path": "."
-		}
-	],
-	"settings": {
-		"editor.tabSize": 2,
-		"editor.defaultFormatter": "esbenp.prettier-vscode",
-		"editor.formatOnSave": true,
-		"editor.insertSpaces": true,
-		"editor.detectIndentation": false,
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+
+  "extensions": {
+    "recommendations": [
+      "dbaeumer.vscode-eslint",
+      "esbenp.prettier-vscode",
+      "vuetifyjs.vuetify-vscode",
+      "octref.vetur"
+    ]
+  },
+  "settings": {
+    "editor.tabSize": 2,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+    "editor.insertSpaces": true,
+    "editor.detectIndentation": false,
     "eslint.lintTask.enable": true,
     "git.ignoreLimitWarning": true
-	  }
+  }
 }

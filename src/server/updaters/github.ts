@@ -49,7 +49,11 @@ function parseRelease(rawRelease: { [key: string]: any }): GithubRelease {
     id: rawRelease.indexOf,
     tagName: rawRelease.tag_name,
     prerelease: rawRelease.prerelease,
-    date: moment(rawRelease.published_at || rawRelease.created_at).unix(),
+    date: moment(
+      rawRelease.assets[0]
+        ? rawRelease.assets[0].published_at || rawRelease.assets[0].created_at
+        : rawRelease.published_at || rawRelease.created_at
+    ).unix(),
     body: rawRelease.body,
     downloadUrl: rawRelease.assets[0]
       ? rawRelease.assets[0].browser_download_url

@@ -50,14 +50,16 @@ export async function findManifests(
           path.join(curPath, fPath),
           'utf-8'
         );
-        result.push([
-          curPath,
-          parsePackageInfo(
-            curPath.split(path.sep).splice(-1, 1)[0],
-            rawManifest,
-            'temp'
-          )
-        ]);
+        const directoryName = curPath.split(path.sep).splice(-1, 1)[0];
+
+        try {
+          result.push([
+            curPath,
+            parsePackageInfo(directoryName, rawManifest, 'temp')
+          ]);
+        } catch (err) {
+          log.error('error parsing manifest.json in ' + curPath, err);
+        }
         break;
       }
       const stats = await fs.lstat(path.join(curPath, fPath));
@@ -83,15 +85,16 @@ export async function parseImportFile(
   return { importPath: tmpName, packages: manifests };
 }
 
-export async function installPackage(pkg: ImportPackageInfo) {
+export async function installPackage(pkg: ImportPackageInfo): Promise<void> {
   const fromPath = pkg[0];
   const toPath = path.join(getPackagePath('community'), pkg[1].directoryName);
   if (existsSync(toPath)) {
     log.debug('install: toPath exists, removing...', toPath);
     await fs.rmdir(toPath, { recursive: true });
   }
+
   return new Promise((resolve, reject) => {
-    log.debug('installPackage: copying');
+    log.debug('installPackage: copying ' + pkg);
     ncp(fromPath, toPath, { stopOnErr: true }, (err) => {
       if (err) {
         reject(err);
@@ -103,7 +106,11 @@ export async function installPackage(pkg: ImportPackageInfo) {
   });
 }
 export async function importPackages(pkgs: ImportPackageInfo[]): Promise<void> {
-  await Promise.all(pkgs.map((p) => installPackage(p)));
+  // could be done in parallel, but this was creating EMFILE: too many open files errors when
+  // installing large numbers of packages (i.e. liveries megapack)
+  for (let i = 0; i < pkgs.length; ++i) {
+    await installPackage(pkgs[i]);
+  }
   await cleanupTmpDir();
   return;
 }

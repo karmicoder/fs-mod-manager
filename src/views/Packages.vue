@@ -2,7 +2,7 @@
   <div class="page-packages" v-if="!loading">
     <v-tabs @change="tabChanged">
       <v-tab
-        >Installed
+        >Community
         <v-badge
           inline
           v-if="packages.community"
@@ -10,7 +10,7 @@
         />
       </v-tab>
 
-      <v-tab
+      <v-tab color="green"
         >Official
         <v-badge
           inline
@@ -21,7 +21,7 @@
       <v-tab
         >Inactive
         <v-badge
-          color="primary"
+          color="grey"
           inline
           v-if="packages.inactive"
           :content="packages.inactive.length.toLocaleString()"
@@ -36,6 +36,10 @@
       >
     </v-tabs>
     <v-main class="overflow-y-auto">
+      <p v-if="location === 'official'">
+        Official packges are managed in-game. Currently installed official
+        packages are listed here for reference.
+      </p>
       <PackageList
         v-if="packages"
         :packages="packages[location]"
@@ -80,10 +84,16 @@ export default Vue.extend({
         tabValues.map((loc) => {
           return getPackages(loc, refresh).then(
             (pkgs) => Vue.set(this.packages, loc, pkgs),
-            () => Vue.set(this.packages, loc, [])
+            (err) => {
+              console.error('getPackages failed for ' + loc, err);
+              Vue.set(this.packages, loc, []);
+            }
           );
         })
-      ).finally(() => (this.loading = false));
+      ).finally(() => {
+        this.loading = false;
+        console.log('packages', this.packages);
+      });
     },
     packageDeactivated(pkg: PackageInfo) {
       // remove from community
