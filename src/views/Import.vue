@@ -29,13 +29,20 @@
       </v-stepper-content>
       <v-stepper-content step="3" class="step-3 elevation-0">
         <v-container>
-          <v-btn color="green white--text" @click="install">
-            <v-icon @click="install">mdi-file-import</v-icon> Install
+          <v-btn
+            color="green white--text"
+            @click="install"
+            :disabled="selectedCount <= 0"
+          >
+            <v-icon @click="install">mdi-file-import</v-icon>
+            Install {{ selectedCount }}
           </v-btn>
           <PackageList
             v-if="importInfo"
             :packages="importPackages"
             selectable
+            :initial-selected="true"
+            @selection-changed="handleSelectionChanged"
           />
 
           <pre v-if="importPackages">{{
@@ -79,7 +86,8 @@ export default Vue.extend({
       step: 1,
       archivePath: undefined as string | undefined,
       importInfo: undefined as ImportInfo | undefined,
-      unarchiveProgress: 0
+      unarchiveProgress: 0,
+      selectedPkgs: [] as boolean[]
     };
   },
   methods: {
@@ -94,9 +102,12 @@ export default Vue.extend({
     install() {
       if (this.importInfo) {
         this.step = 4;
-        const numPackages = this.importInfo.packages.length;
+        const packages = this.importInfo.packages.filter(
+          (p, i) => this.selectedPkgs[i]
+        );
+        const numPackages = packages.length;
         console.log('importing...');
-        importPackages(this.importInfo.packages).then(
+        importPackages(packages).then(
           () => {
             successSnack(numPackages + ' package(s) imported');
             clearPackageInfo();
@@ -107,11 +118,17 @@ export default Vue.extend({
           }
         );
       }
+    },
+    handleSelectionChanged(newVal: boolean[]) {
+      this.selectedPkgs = newVal;
     }
   },
   computed: {
     importPackages(): PackageInfo[] | undefined {
       return this.importInfo?.packages.map((p) => p[1]);
+    },
+    selectedCount(): number {
+      return this.selectedPkgs.filter((s) => s).length;
     }
   },
   watch: {

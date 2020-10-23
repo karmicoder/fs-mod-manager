@@ -3,8 +3,8 @@
     <v-checkbox
       class="select"
       v-if="selectable"
-      :value="isSelected"
-      @change="selected"
+      :true-value="true"
+      v-model="internalSelected"
     />
     <v-container>
       <v-card-title
@@ -88,13 +88,17 @@ export default Vue.extend({
     },
     isSelected: {
       type: Boolean,
-      default: true
+      default: false
     },
     updater: {
       type: Object as () => UpdaterDef
     }
   },
-
+  data() {
+    return {
+      internalSelected: this.isSelected
+    };
+  },
   methods: {
     bytes,
     deactivate() {
@@ -123,13 +127,22 @@ export default Vue.extend({
         }
       );
     },
-    selected(val: boolean) {
-      this.$emit('selected', val);
+    checkChanged(val: boolean | null) {
+      console.log('item selected', { pkg: this.pkg, val });
+      this.$emit('select', !!val, this.pkg);
     }
   },
   computed: {
     unmetDeps(): UnmetPackageDependency[] {
       return unmetDependencies(this.pkg);
+    }
+  },
+  watch: {
+    internalSelected(newVal) {
+      this.$emit('select', !!newVal, this.pkg);
+    },
+    isSelected(newVal) {
+      this.internalSelected = newVal;
     }
   }
 });
