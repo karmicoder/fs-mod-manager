@@ -6,7 +6,7 @@
         <v-badge
           inline
           v-if="packages.community"
-          :content="packages.community.length"
+          :content="packages.community.length.toLocaleString()"
         />
       </v-tab>
 
@@ -16,7 +16,7 @@
           inline
           color="green"
           v-if="packages.official"
-          :content="packages.official.length"
+          :content="packages.official.length.toLocaleString()"
       /></v-tab>
       <v-tab
         >Inactive
@@ -83,7 +83,7 @@ export default Vue.extend({
       Promise.all(
         tabValues.map((loc) => {
           return getPackages(loc, refresh).then(
-            (pkgs) => Vue.set(this.packages, loc, pkgs),
+            (pkgs) => Vue.set(this.packages, loc, pkgs || []),
             (err) => {
               console.error('getPackages failed for ' + loc, err);
               Vue.set(this.packages, loc, []);
