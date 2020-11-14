@@ -43,6 +43,7 @@ export default Vue.extend({
   width: 100%;
   .splash-content {
     z-index: 1;
+    margin: 24px;
   }
   .splash-bg {
     background: url(../assets/sky-bg.svg) no-repeat center center,

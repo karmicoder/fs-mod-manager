@@ -87,7 +87,7 @@ async function downloadPackage(
       'got chunk: downloaded ' + bytes(bytesRx) + '/' + bytes(fileSize)
     );
     try {
-      webContents.getFocusedWebContents().send('update-progress', {
+      webContents.getAllWebContents()[0].send('update-progress', {
         packageDir,
         operation: 'Downloading',
         progress: (bytesRx / fileSize) * 100 * 0.2
