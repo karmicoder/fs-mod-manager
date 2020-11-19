@@ -65,6 +65,14 @@ export default Vue.extend({
         this.$emit('selection-changed', this.selections.slice());
         console.log('itemSelected', this.selections);
       }
+    },
+    selectAll() {
+      this.selections = this.packages.map(() => true);
+      // this.$emit('selection-changed', this.selections.slice());
+    },
+    selectNone() {
+      this.selections = this.packages.map(() => false);
+      // this.$emit('selection-changed', this.selections.slice());
     }
   }
 });

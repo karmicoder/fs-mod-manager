@@ -12,7 +12,7 @@ import {
 import { app, ipcMain, IpcMainEvent, BrowserWindow } from 'electron';
 
 import { backupPackage } from './backup';
-import { importPackages, parseImportFile, selectImportFile } from './import';
+import { importPackages, parseImportFile, selectImportFiles } from './import';
 import log from './log';
 import {
   findMsfsInstallPath,
@@ -46,7 +46,7 @@ ipcMain.handle('activatePackage', (ev, pkgDirectory: string) =>
 );
 ipcMain.handle('backupPackage', (ev, pkg: PackageInfo) => backupPackage(pkg));
 
-ipcMain.handle('selectImportFile', selectImportFile);
+ipcMain.handle('selectImportFiles', selectImportFiles);
 ipcMain.handle('parseImportFile', (ev, archivePath: string) =>
   parseImportFile(archivePath, (percent) => {
     ev.sender.send('unarchive_progress', percent);

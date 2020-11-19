@@ -22,13 +22,13 @@
       </v-stepper-content>
       <v-stepper-content step="2" class="elevation-0">
         <span v-if="!importInfo"
-          >Extracting files {{ this.archivePath }}...
-          {{ unarchiveProgress }}</span
+          >Extracting files {{ archivePaths && archivePaths.join(', ') }}...
+          {{ unarchiveProgress }}&percnt;</span
         >
         <v-progress-linear v-model="unarchiveProgress" />
       </v-stepper-content>
       <v-stepper-content step="3" class="step-3 elevation-0">
-        <v-container>
+        <v-toolbar flat>
           <v-btn
             color="green white--text"
             @click="install"
@@ -37,17 +37,29 @@
             <v-icon @click="install">mdi-file-import</v-icon>
             Install {{ selectedCount }}
           </v-btn>
+          <v-btn
+            icon
+            small
+            :disabled="
+              selectedCount === (importPackages ? importPackages.length : 0)
+            "
+            @click="selectAll"
+          >
+            <v-icon>mdi-checkbox-multiple-marked-outline</v-icon>
+          </v-btn>
+          <v-btn icon small :disabled="selectedCount === 0" @click="selectNone">
+            <v-icon>mdi-checkbox-multiple-blank-outline</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-container>
           <PackageList
-            v-if="importInfo"
-            :packages="importPackages"
+            ref="packageList"
+            v-if="importInfos"
+            :packages="importPackages.map((ip) => ip[1])"
             selectable
             :initial-selected="true"
             @selection-changed="handleSelectionChanged"
           />
-
-          <pre v-if="importPackages">{{
-            JSON.stringify(importInfo, null, 2)
-          }}</pre>
         </v-container>
       </v-stepper-content>
       <v-stepper-content step="4" class="elevation-0">
@@ -60,13 +72,13 @@
 <script lang="ts">
 import { clearPackageInfo } from '@/data/packageInfo';
 import ipcRenderer, {
-  selectImportFile,
+  selectImportFiles,
   parseImportFile,
   importPackages
 } from '@/ipcRenderer';
 import Vue from 'vue';
 import PackageList from '@/components/packageList.vue';
-import { ImportInfo, PackageInfo } from '@/types/packageInfo';
+import { ImportInfo, ImportPackageInfo } from '@/types/packageInfo';
 import { errorSnack, successSnack } from '@/components/snack.vue';
 
 export default Vue.extend({
@@ -84,28 +96,27 @@ export default Vue.extend({
   data() {
     return {
       step: 1,
-      archivePath: undefined as string | undefined,
-      importInfo: undefined as ImportInfo | undefined,
+      archivePaths: undefined as string[] | undefined,
+      importInfos: undefined as ImportInfo[] | undefined,
       unarchiveProgress: 0,
       selectedPkgs: [] as boolean[]
     };
   },
   methods: {
     selectArchive() {
-      selectImportFile().then((path) => {
-        if (path && path !== '') {
-          this.archivePath = path;
+      selectImportFiles().then((paths) => {
+        if (paths && paths.length > 0) {
+          this.archivePaths = paths;
           this.step = 2;
         }
       });
     },
     install() {
-      if (this.importInfo) {
+      if (this.importInfos) {
         this.step = 4;
-        const packages = this.importInfo.packages.filter(
-          (p, i) => this.selectedPkgs[i]
-        );
-        const numPackages = packages.length;
+        const packages =
+          this.importPackages?.filter((p, i) => this.selectedPkgs[i]) || [];
+        const numPackages = packages?.length || 0;
         console.log('importing...');
         importPackages(packages).then(
           () => {
@@ -119,13 +130,26 @@ export default Vue.extend({
         );
       }
     },
+    selectAll() {
+      (this.$refs.packageList as any).selectAll();
+    },
+    selectNone() {
+      (this.$refs.packageList as any).selectNone();
+    },
     handleSelectionChanged(newVal: boolean[]) {
       this.selectedPkgs = newVal;
     }
   },
   computed: {
-    importPackages(): PackageInfo[] | undefined {
-      return this.importInfo?.packages.map((p) => p[1]);
+    importPackages(): ImportPackageInfo[] | undefined {
+      if (!this.importInfos) {
+        return undefined;
+      }
+      let result: ImportPackageInfo[] = [];
+      this.importInfos.forEach((importInfo) => {
+        result = result.concat(importInfo.packages);
+      });
+      return result;
     },
     selectedCount(): number {
       return this.selectedPkgs.filter((s) => s).length;
@@ -133,13 +157,17 @@ export default Vue.extend({
   },
   watch: {
     step: function(newVal) {
-      if (newVal === 2 && this.archivePath) {
-        parseImportFile(this.archivePath)
-          .then((importInfo) => {
-            this.importInfo = importInfo;
-            this.step = 3;
-          })
-          .finally(() => (this.unarchiveProgress = 0));
+      if (newVal === 2 && this.archivePaths) {
+        Promise.all(
+          this.archivePaths.map(
+            (path): Promise<ImportInfo> => {
+              return parseImportFile(path);
+            }
+          )
+        ).then((importInfos) => {
+          this.importInfos = importInfos;
+          this.step = 3;
+        });
       }
     }
   }

@@ -32,8 +32,8 @@ export function backupPackage(pkg: PackageInfo): Promise<void> {
   return ipcRenderer.invoke('backupPackage', pkg);
 }
 
-export function selectImportFile(): Promise<string> {
-  return ipcRenderer.invoke('selectImportFile');
+export function selectImportFiles(): Promise<string[]> {
+  return ipcRenderer.invoke('selectImportFiles');
 }
 
 export function parseImportFile(archive: string): Promise<ImportInfo> {

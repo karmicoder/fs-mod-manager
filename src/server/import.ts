@@ -16,15 +16,15 @@ import { parsePackageInfo } from '@/data/parsePackageInfo';
 
 let tmpDir: tmp.DirResult | undefined;
 
-export async function selectImportFile(): Promise<string> {
+export async function selectImportFiles(): Promise<string[]> {
   const result = await dialog.showOpenDialog({
     defaultPath: app.getPath('downloads'),
     filters: [
       { name: 'Package Archives', extensions: ['zip', 'rar', '7z', 'tar.gz'] }
     ],
-    properties: ['openFile']
+    properties: ['openFile', 'multiSelections']
   });
-  return result.filePaths[0];
+  return result.filePaths;
 }
 
 async function cleanupTmpDir() {
