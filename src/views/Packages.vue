@@ -110,6 +110,8 @@ export default Vue.extend({
         'inactive',
         this.packages.inactive.concat([pkg]).sort(packageNameComparator)
       );
+      // update location
+      pkg.location = 'inactive';
     },
     packageActivated(pkg: PackageInfo) {
       // remove from inactive
@@ -126,6 +128,7 @@ export default Vue.extend({
         'active',
         this.packages.active.concat([pkg]).sort(packageNameComparator)
       );
+      pkg.location = 'community';
     }
   },
   watch: {},
