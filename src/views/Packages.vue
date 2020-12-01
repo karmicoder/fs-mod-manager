@@ -6,7 +6,12 @@
         <v-badge
           inline
           v-if="packages.community"
-          :content="packages.community.length.toLocaleString()"
+          :content="
+            (location == 'community'
+              ? shownPackages
+              : packages.community
+            ).length.toLocaleString()
+          "
         />
       </v-tab>
 
@@ -27,6 +32,17 @@
           :content="packages.inactive.length.toLocaleString()"
       /></v-tab>
       <v-spacer />
+      <v-text-field
+        outlined
+        dense
+        prepend-inner-icon="mdi-magnify"
+        v-model="searchText"
+        @input="searchTextChanged"
+        @clear="updateShownPackages"
+        :width="128"
+        clearable
+        hide-details="true"
+      />
       <v-btn
         color="accent"
         icon
@@ -42,7 +58,7 @@
       </p>
       <PackageList
         v-if="packages"
-        :packages="packages[location]"
+        :packages="shownPackages"
         @deactivated="packageDeactivated"
         @activated="packageActivated"
       />
@@ -54,6 +70,7 @@ import Vue from 'vue';
 import PackageList from '@/components/packageList.vue';
 import { getPackages, packageNameComparator } from '@/data/packageInfo';
 import { PackageInfo, PackageLocation } from '@/types/packageInfo';
+import { debounce } from '@/utils/timing';
 
 const tabValues: PackageLocation[] = ['community', 'official', 'inactive'];
 
@@ -65,15 +82,18 @@ export default Vue.extend({
   data() {
     return {
       packages: {} as { [key: string]: PackageInfo[] },
+      shownPackages: [] as PackageInfo[],
       location:
         (this.$route.params.tab as PackageLocation) ||
         ('community' as PackageLocation),
-      loading: true
+      loading: true,
+      searchText: null as string | null
     };
   },
   methods: {
     tabChanged(tabIndex: number) {
       this.location = tabValues[tabIndex];
+      this.updateShownPackages();
     },
     getPackages(refresh = false) {
       if (refresh) {
@@ -129,6 +149,23 @@ export default Vue.extend({
         this.packages.active.concat([pkg]).sort(packageNameComparator)
       );
       pkg.location = 'community';
+    },
+    searchTextChanged: debounce(function(this: any) {
+      console.log('searchInputChanged', this.searchText);
+      this.updateShownPackages();
+    }),
+    updateShownPackages() {
+      const { location, shownPackages } = this;
+      console.log('updateShownPackages', { location, shownPackages });
+      if (this.searchText && this.searchText.length > 0) {
+        const regex = new RegExp(this.searchText || '', 'i');
+
+        this.shownPackages = this.packages[this.location].filter((p) =>
+          regex.test([p.title || '', p.directoryName || ''].join('|'))
+        );
+      } else {
+        this.shownPackages = this.packages[this.location];
+      }
     }
   },
   watch: {},
